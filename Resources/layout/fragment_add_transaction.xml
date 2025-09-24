@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+		<!-- Errores de validación -->
+		<LinearLayout
+            android:id="@+id/layout_validation_errors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone" />
+
+		<!-- Descripción -->
+		<com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Descripción">
+
+			<com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+		</com.google.android.material.textfield.TextInputLayout>
+
+		<!-- Monto -->
+		<com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Monto">
+
+			<com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+
+		</com.google.android.material.textfield.TextInputLayout>
+
+		<!-- Tipo de transacción -->
+		<LinearLayout
+            android:id="@+id/chip_group_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+			<RadioButton
+                android:id="@+id/chip_expense_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gasto"
+                android:checked="true" />
+
+			<RadioButton
+                android:id="@+id/chip_income_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ingreso" />
+
+		</LinearLayout>
+
+		<!-- Categoría -->
+		<Spinner
+            android:id="@+id/spinner_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
+		<!-- Fecha -->
+		<EditText
+            android:id="@+id/edit_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Fecha"
+            android:focusable="false" />
+
+		<!-- Notas -->
+		<EditText
+            android:id="@+id/edit_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Notas (opcional)"
+            android:inputType="textMultiLine" />
+
+		<!-- Ubicación -->
+		<EditText
+            android:id="@+id/edit_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ubicación (opcional)" />
+
+		<!-- Recurrente -->
+		<CheckBox
+            android:id="@+id/checkbox_recurring"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Transacción recurrente" />
+
+		<!-- Botones -->
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+			<Button
+                android:id="@+id/button_cancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cancelar" />
+
+			<Button
+                android:id="@+id/button_save"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Guardar" />
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</ScrollView>

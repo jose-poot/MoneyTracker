@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Tema principal -->
+	<style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+		<item name="colorPrimary">@color/colorPrimary</item>
+		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+		<item name="colorAccent">@color/colorAccent</item>
+		<item name="android:windowBackground">@color/background_light</item>
+	</style>
+	<style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+		<item name="colorPrimary">#2196F3</item>
+		<item name="colorPrimaryDark">#1976D2</item>
+		<item name="colorAccent">#FF4081</item>
+	</style>
+	<!-- Estilos para formularios -->
+	<style name="FormTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+		<item name="boxStrokeColor">@color/colorPrimary</item>
+		<item name="hintTextColor">@color/colorPrimary</item>
+	</style>
+
+	<!-- Estilos para botones -->
+	<style name="PrimaryButton" parent="Widget.MaterialComponents.Button">
+		<item name="backgroundTint">@color/colorPrimary</item>
+		<item name="android:textColor">@android:color/white</item>
+		<item name="cornerRadius">8dp</item>
+	</style>
+
+	<!-- Estilos para cards -->
+	<style name="TransactionCard" parent="Widget.MaterialComponents.CardView">
+		<item name="cardCornerRadius">8dp</item>
+		<item name="cardElevation">2dp</item>
+		<item name="cardUseCompatPadding">true</item>
+	</style>
+
+</resources>

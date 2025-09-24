@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net9.0-android</TargetFramework>
+		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+		<OutputType>Exe</OutputType>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ApplicationId>com.companyname.MoneyTracker</ApplicationId>
+		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<TrimMode>full</TrimMode>
+
+		<!-- ✅ CRÍTICO: DESHABILITAR WARNINGS AS ERRORS -->
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Folder Include="Application\Common\" />
+		<Folder Include="Application\Extensions\" />
+		<Folder Include="Core\Enums\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- ARQUITECTURA Y PATRONES -->
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+
+		<!-- MVVM Y UI -->
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+
+		<!-- BASE DE DATOS -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+
+		<!-- MAPPING Y VALIDACIÓN -->
+		<PackageReference Include="AutoMapper" Version="12.0.1" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+		<PackageReference Include="FluentValidation" Version="11.8.0" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.8.0" />
+
+		<!-- HTTP Y JSON -->
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
+
+		<!-- ✅ UI COMPONENTS - VERSIONES COMPATIBLES -->
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.11.0.1" />
+		<PackageReference Include="Xamarin.AndroidX.SwipeRefreshLayout" Version="1.1.0.15" />
+
+		<!-- ✅ REMOVER PAQUETES CONFLICTIVOS - Dejar que Material los resuelva automáticamente -->
+		<!-- NO incluir AppCompat, ConstraintLayout, Fragment, RecyclerView manualmente -->
+	</ItemGroup>
+</Project>

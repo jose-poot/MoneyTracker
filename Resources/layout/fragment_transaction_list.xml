@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+	<!-- Resumen financiero -->
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+		<TextView
+            android:id="@+id/text_balance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Balance: $0.00"
+            android:textSize="18sp" />
+
+		<TextView
+            android:id="@+id/text_income"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingresos: $0.00"
+            android:textColor="#4CAF50" />
+
+		<TextView
+            android:id="@+id/text_expenses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gastos: $0.00"
+            android:textColor="#F44336" />
+
+	</LinearLayout>
+
+	<!-- Búsqueda -->
+	<EditText
+        android:id="@+id/edit_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:hint="Buscar transacciones..." />
+
+	<!-- Filtros -->
+	<LinearLayout
+        android:id="@+id/chip_group_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+		<Button
+            android:id="@+id/chip_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Todas" />
+
+		<Button
+            android:id="@+id/chip_income"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingresos" />
+
+		<Button
+            android:id="@+id/chip_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gastos" />
+
+	</LinearLayout>
+
+	<!-- SwipeRefresh con RecyclerView -->
+	<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+		<androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_transactions"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+	</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+	<!-- Estado vacío -->
+	<LinearLayout
+        android:id="@+id/layout_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+		<TextView
+            android:id="@+id/text_empty_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hay transacciones"
+            android:textSize="16sp" />
+
+	</LinearLayout>
+
+	<!-- FAB -->
+	<com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_input_add" />
+
+</LinearLayout>

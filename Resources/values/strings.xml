@@ -1,0 +1,30 @@
+<resources>
+	<string name="app_name">MoneyTracker</string>
+	<string name="navigation_drawer_open">Abrir menú</string>
+	<string name="navigation_drawer_close">Cerrar menú</string>
+	<string name="action_settings">Configuración</string>
+
+	<!-- Títulos -->
+	<string name="title_transactions">Transacciones</string>
+	<string name="title_add_transaction">Nueva Transacción</string>
+	<string name="title_edit_transaction">Editar Transacción</string>
+	<string name="title_categories">Categorías</string>
+	<string name="title_summary">Resumen</string>
+
+	<!-- Botones -->
+	<string name="button_save">Guardar</string>
+	<string name="button_cancel">Cancelar</string>
+	<string name="button_delete">Eliminar</string>
+	<string name="button_edit">Editar</string>
+	<string name="button_add">Agregar</string>
+
+	<!-- Mensajes -->
+	<string name="message_transaction_saved">Transacción guardada correctamente</string>
+	<string name="message_transaction_deleted">Transacción eliminada</string>
+	<string name="message_confirm_delete">¿Estás seguro de que quieres eliminar esta transacción?</string>
+
+	<!-- Errores -->
+	<string name="error_required_field">Este campo es obligatorio</string>
+	<string name="error_invalid_amount">Monto inválido</string>
+	<string name="error_connection">Error de conexión</string>
+</resources>
