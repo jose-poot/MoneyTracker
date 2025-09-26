@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace MoneyTracker.Presentation.ViewModels;
 
 /// <summary>
-/// ViewModel para la pantalla principal de lista de transacciones
+/// ViewModel for the main transaction list screen.
 /// </summary>
 public partial class TransactionListViewModel : BaseViewModel
 {
@@ -30,9 +30,6 @@ public partial class TransactionListViewModel : BaseViewModel
         TransactionAppService transactionService,
         CategoryAppService categoryService,
         IDialogService dialogService,
-
-        INavigationService navigationService)
-        : base(dialogService, navigationService)
         INavigationService navigationService,
         ICacheService? cacheService = null)
         : base(dialogService, navigationService, cacheService)
@@ -40,17 +37,17 @@ public partial class TransactionListViewModel : BaseViewModel
     {
         _transactionService = transactionService;
         _categoryService = categoryService;
-        Title = "Mis Transacciones";
+        Title = "My Transactions";
 
         FilteredTransactions = new VirtualizedObservableCollection<TransactionDto>(pageSize: 25);
         FilteredTransactions.SetSortComparer((x, y) => DateTime.Compare(y.Date, x.Date));
 
-        // Cargar datos iniciales
+        // Load initial data
         _ = LoadDataAsync();
     }
 
     /// <summary>
-    /// Opciones de filtro de fechas disponibles.
+    /// Available date filter options.
     /// </summary>
     public enum DateFilterOption
     {
@@ -59,132 +56,132 @@ public partial class TransactionListViewModel : BaseViewModel
         Last30Days
     }
 
-    #region Propiedades Observables
+    #region Observable Properties
 
     /// <summary>
-    /// Transacciones filtradas para mostrar
+    /// Transactions filtered for display.
     /// </summary>
     public VirtualizedObservableCollection<TransactionDto> FilteredTransactions { get; }
 
     /// <summary>
-    /// Transacciones visibles en la página actual
+    /// Transactions visible on the current page.
     /// </summary>
     public IReadOnlyList<TransactionDto> VisibleTransactions => FilteredTransactions.VisibleItems;
 
     /// <summary>
-    /// Indica si hay más elementos para paginar
+    /// Indicates whether more items can be paged in.
     /// </summary>
     public bool HasMoreTransactions => FilteredTransactions.HasMorePages;
 
     /// <summary>
-    /// Filtro de texto para buscar
+    /// Text filter used for search.
     /// </summary>
     [ObservableProperty]
     private string _searchText = string.Empty;
 
     /// <summary>
-    /// Filtro por tipo de transacción
+    /// Filter by transaction type.
     /// </summary>
     [ObservableProperty]
     private TransactionType? _selectedType = null;
 
     /// <summary>
-    /// Balance total calculado
+    /// Calculated total balance.
     /// </summary>
     [ObservableProperty]
     private decimal _totalBalance;
 
     /// <summary>
-    /// Total de ingresos del período
+    /// Total income for the selected period.
     /// </summary>
     [ObservableProperty]
     private decimal _totalIncome;
 
     /// <summary>
-    /// Total de gastos del período
+    /// Total expenses for the selected period.
     /// </summary>
     [ObservableProperty]
     private decimal _totalExpenses;
 
     /// <summary>
-    /// Indica si hay transacciones para mostrar
+    /// Indicates if there are transactions to display.
     /// </summary>
     [ObservableProperty]
     private bool _hasTransactions;
 
     /// <summary>
-    /// Mensaje cuando no hay transacciones
+    /// Message displayed when there are no transactions.
     /// </summary>
     [ObservableProperty]
-    private string _emptyMessage = "No hay transacciones aún.\n¡Agrega tu primera transacción!";
+    private string _emptyMessage = "No transactions yet.\nAdd your first transaction!";
 
     /// <summary>
-    /// Categoría seleccionada para filtrar.
+    /// Selected category used for filtering.
     /// </summary>
     [ObservableProperty]
     private CategoryDto? _selectedCategory;
 
     /// <summary>
-    /// Controla si se muestran solo transacciones recurrentes.
+    /// Determines whether only recurring transactions are shown.
     /// </summary>
     [ObservableProperty]
     private bool _showOnlyRecurring;
 
     /// <summary>
-    /// Filtro de fechas seleccionado.
+    /// Selected date filter option.
     /// </summary>
     [ObservableProperty]
     private DateFilterOption _selectedDateFilter = DateFilterOption.CurrentMonth;
 
     /// <summary>
-    /// Descripción legible del rango de fechas aplicado.
+    /// Readable description of the applied date range.
     /// </summary>
     [ObservableProperty]
     private string _dateRangeDescription = string.Empty;
 
     /// <summary>
-    /// Texto con recomendaciones o estadísticas rápidas.
+    /// Text containing quick recommendations or statistics.
     /// </summary>
     [ObservableProperty]
     private string _spendingInsights = string.Empty;
 
     #endregion
 
-    #region Propiedades Calculadas
+    #region Calculated Properties
 
     /// <summary>
-    /// Balance formateado para mostrar en UI
+    /// Balance formatted for the UI.
     /// </summary>
     public string FormattedBalance => TotalBalance >= 0
         ? $"+${TotalBalance:N2}"
         : $"-${Math.Abs(TotalBalance):N2}";
 
     /// <summary>
-    /// Color del balance según si es positivo o negativo
+    /// Balance color depending on whether it is positive or negative.
     /// </summary>
     public string BalanceColor => TotalBalance >= 0 ? "#4CAF50" : "#F44336";
 
     /// <summary>
-    /// Ingresos formateados
+    /// Formatted income.
     /// </summary>
     public string FormattedIncome => $"${TotalIncome:N2}";
 
     /// <summary>
-    /// Gastos formateados
+    /// Formatted expenses.
     /// </summary>
     public string FormattedExpenses => $"${TotalExpenses:N2}";
 
     /// <summary>
-    /// Categorías disponibles para filtros.
+    /// Categories available for filtering.
     /// </summary>
     public IReadOnlyList<CategoryDto> Categories => _categories;
 
     #endregion
 
-    #region Comandos
+    #region Commands
 
     /// <summary>
-    /// Carga todas las transacciones
+    /// Loads every transaction.
     /// </summary>
     [RelayCommand]
     private async Task LoadDataAsync()
@@ -206,7 +203,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Buscar transacciones por texto
+    /// Searches transactions by text.
     /// </summary>
     [RelayCommand]
     private void Search()
@@ -215,7 +212,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Filtrar por tipo de transacción
+    /// Filters by transaction type.
     /// </summary>
     [RelayCommand]
     private void FilterByType(TransactionType? type)
@@ -225,7 +222,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Cambia el filtro de fechas activo.
+    /// Changes the active date filter.
     /// </summary>
     [RelayCommand]
     private void SetDateFilter(DateFilterOption option)
@@ -234,7 +231,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Limpiar todos los filtros
+    /// Clears every filter.
     /// </summary>
     [RelayCommand]
     private void ClearFilters()
@@ -257,7 +254,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Navegar a agregar transacción
+    /// Navigates to the screen for adding a transaction.
     /// </summary>
     [RelayCommand]
     private async Task NavigateToAddTransaction()
@@ -273,7 +270,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Editar una transacción
+    /// Edits a transaction.
     /// </summary>
     [RelayCommand]
     private async Task EditTransaction(TransactionDto transaction)
@@ -292,7 +289,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Eliminar una transacción
+    /// Deletes a transaction.
     /// </summary>
     [RelayCommand]
     private async Task DeleteTransactionAsync(TransactionDto transaction)
@@ -315,22 +312,22 @@ public partial class TransactionListViewModel : BaseViewModel
                 EmptyMessage = GetEmptyMessage();
 
 
-                DialogService?.ShowToast("Transacción eliminada correctamente");
-                await ShowMessageAsync("Transacción eliminada correctamente");
+                DialogService?.ShowToast("Transaction deleted successfully");
+                await ShowMessageAsync("Transaction deleted successfully");
 
             }
             else
             {
-                // Mostrar errores
+                // Display errors
                 var errorMessage = string.Join("\n", result.Errors);
 
                 _ = DialogService?.ShowErrorAsync(string.IsNullOrWhiteSpace(errorMessage)
-                    ? "Ocurrió un error"
+                    ? "An error occurred"
                     : errorMessage);
 
                 if (DialogService != null)
                 {
-                    var message = string.IsNullOrWhiteSpace(errorMessage) ? "Ocurrió un error" : errorMessage;
+                    var message = string.IsNullOrWhiteSpace(errorMessage) ? "An error occurred" : errorMessage;
                     await DialogService.ShowErrorAsync(message);
                 }
 
@@ -339,7 +336,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Intenta cargar la siguiente página de resultados.
+    /// Attempts to load the next page of results.
     /// </summary>
     public bool TryLoadMoreTransactions()
     {
@@ -354,7 +351,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Refresh manual
+    /// Manual refresh implementation.
     /// </summary>
     protected override async Task RefreshAsync()
     {
@@ -371,10 +368,10 @@ public partial class TransactionListViewModel : BaseViewModel
 
     #endregion
 
-    #region Métodos Privados
+    #region Private Methods
 
     /// <summary>
-    /// Aplica los filtros actuales a la lista de transacciones
+    /// Applies the current filters to the transaction list.
     /// </summary>
     private void ApplyFilters()
     {
@@ -446,7 +443,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Calcula los totales de ingresos, gastos y balance
+    /// Calculates totals for income, expenses, and balance.
     /// </summary>
     private void CalculateTotals()
     {
@@ -462,25 +459,25 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Obtiene el mensaje apropiado cuando no hay transacciones
+    /// Gets the appropriate empty-state message.
     /// </summary>
     private string GetEmptyMessage()
     {
         if (!_allTransactions.Any())
         {
-            return "No hay transacciones aún.\n¡Agrega tu primera transacción!";
+            return "No transactions yet.\nAdd your first transaction!";
         }
 
         if (!_currentFilteredTransactions.Any())
         {
-            return "No se encontraron transacciones\ncon los filtros aplicados.";
+            return "No transactions found with the applied filters.";
         }
 
-        return "No hay transacciones para mostrar.";
+        return "There are no transactions to display.";
     }
 
     /// <summary>
-    /// Obtiene el rango de fechas activo dependiendo de la opción seleccionada.
+    /// Gets the active date range based on the selected option.
     /// </summary>
     private (DateTime? Start, DateTime? End) GetDateRange()
     {
@@ -497,7 +494,7 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Actualiza la descripción del rango de fechas activo para mostrar en UI.
+    /// Updates the active date range description shown in the UI.
     /// </summary>
     private void UpdateDateRangeDescription()
     {
@@ -505,33 +502,33 @@ public partial class TransactionListViewModel : BaseViewModel
 
         if (!start.HasValue && !end.HasValue)
         {
-            DateRangeDescription = "Mostrando: Todas las fechas";
+            DateRangeDescription = "Showing: All dates";
             return;
         }
 
         if (start.HasValue && end.HasValue)
         {
-            DateRangeDescription = $"Mostrando: {start.Value:dd MMM yyyy} - {end.Value:dd MMM yyyy}";
+            DateRangeDescription = $"Showing: {start.Value:dd MMM yyyy} - {end.Value:dd MMM yyyy}";
             return;
         }
 
         if (start.HasValue)
         {
-            DateRangeDescription = $"Mostrando: Desde {start.Value:dd MMM yyyy}";
+            DateRangeDescription = $"Showing: From {start.Value:dd MMM yyyy}";
             return;
         }
 
-        DateRangeDescription = $"Mostrando: Hasta {end!.Value:dd MMM yyyy}";
+        DateRangeDescription = $"Showing: Until {end!.Value:dd MMM yyyy}";
     }
 
     /// <summary>
-    /// Calcula métricas rápidas para ofrecer recomendaciones.
+    /// Calculates quick metrics to provide recommendations.
     /// </summary>
     private void UpdateInsights()
     {
         if (!_currentFilteredTransactions.Any())
         {
-            SpendingInsights = "Agrega transacciones para ver estadísticas personalizadas.";
+            SpendingInsights = "Add transactions to see personalized statistics.";
             return;
         }
 
@@ -555,15 +552,15 @@ public partial class TransactionListViewModel : BaseViewModel
 
         if (topCategory == null || topCategory.Total <= 0)
         {
-            SpendingInsights = $"Promedio diario de gastos: ${dailyAverage:N2}. Transacciones recurrentes activas: {recurringCount}.";
+            SpendingInsights = $"Daily spending average: ${dailyAverage:N2}. Active recurring transactions: {recurringCount}.";
             return;
         }
 
-        SpendingInsights = $"Categoría principal: {topCategory.Category} (${topCategory.Total:N2}). Promedio diario de gastos: ${dailyAverage:N2}. Recurrentes: {recurringCount}.";
+        SpendingInsights = $"Top category: {topCategory.Category} (${topCategory.Total:N2}). Daily spending average: ${dailyAverage:N2}. Recurring transactions: {recurringCount}.";
     }
 
     /// <summary>
-    /// Carga las categorías disponibles para aplicar filtros.
+    /// Loads the categories available for filtering.
     /// </summary>
     private async Task LoadCategoriesAsync()
     {
@@ -590,7 +587,7 @@ public partial class TransactionListViewModel : BaseViewModel
     #region Event Handlers
 
     /// <summary>
-    /// Se llama cuando cambia el texto de búsqueda
+    /// Invoked when the search text changes.
     /// </summary>
     partial void OnSearchTextChanged(string value)
     {

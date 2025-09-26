@@ -3,35 +3,35 @@
 namespace MoneyTracker.Application.DTOs;
 
 /// <summary>
-/// DTO para categorías - datos específicos para la UI
+/// DTO for categories - UI-specific data.
 /// </summary>
 public class CategoryDto
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "El nombre de la categoría es obligatorio")]
-    [StringLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres")]
+    [Required(ErrorMessage = "The category name is required")]
+    [StringLength(50, ErrorMessage = "The name cannot exceed 50 characters")]
     public string Name { get; set; } = string.Empty;
 
-    [StringLength(200, ErrorMessage = "La descripción no puede tener más de 200 caracteres")]
+    [StringLength(200, ErrorMessage = "The description cannot exceed 200 characters")]
     public string Description { get; set; } = string.Empty;
 
-    [RegularExpression(@"^#([A-Fa-f0-9]{6})$", ErrorMessage = "El color debe ser en formato hexadecimal (#RRGGBB)")]
+    [RegularExpression(@"^#([A-Fa-f0-9]{6})$", ErrorMessage = "The color must be in hexadecimal format (#RRGGBB)")]
     public string Color { get; set; } = "#2196F3";
 
     public string Icon { get; set; } = "category";
     public bool IsActive { get; set; } = true;
 
-    // Propiedades calculadas para estadísticas
+    // Calculated properties for statistics
     public int TransactionCount { get; set; }
     public decimal TotalAmount { get; set; }
     public string FormattedTotal => $"${TotalAmount:N2}";
 
-    // Para UI
-    public bool IsSelected { get; set; } // Para selección múltiple
-    public bool CanDelete { get; set; } // Si tiene transacciones, no se puede borrar
+    // UI helpers
+    public bool IsSelected { get; set; } // For multi-selection
+    public bool CanDelete { get; set; } // Cannot be removed if it has transactions
 
-    // Sobrescribir ToString() para que el Spinner muestre el nombre
+    // Override ToString() so the Spinner displays the name
     public override string ToString()
     {
         return Name;

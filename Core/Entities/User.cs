@@ -1,7 +1,7 @@
 ﻿namespace MoneyTracker.Core.Entities;
 
 /// <summary>
-/// Usuario del sistema (para futuras funcionalidades)
+/// System user (reserved for future functionality).
 /// </summary>
 public class User
 {
@@ -13,29 +13,29 @@ public class User
     public DateTime? LastLoginAt { get; set; }
     public bool IsActive { get; set; } = true;
 
-    // Configuraciones del usuario
+    // User settings
     public bool ShowNotifications { get; set; } = true;
     public string DateFormat { get; set; } = "dd/MM/yyyy";
     public string Theme { get; set; } = "Light"; // Light, Dark
 
-    // Relaciones
+    // Relationships
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
 
     /// <summary>
-    /// Valida los datos del usuario
+    /// Validates the user data.
     /// </summary>
     public bool IsValid(out List<string> errors)
     {
         errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(Name))
-            errors.Add("El nombre es obligatorio");
+            errors.Add("The name is required");
 
         if (string.IsNullOrWhiteSpace(Email))
-            errors.Add("El email es obligatorio");
+            errors.Add("The email is required");
         else if (!IsValidEmail(Email))
-            errors.Add("El formato del email no es válido");
+            errors.Add("The email format is not valid");
 
         return errors.Count == 0;
     }

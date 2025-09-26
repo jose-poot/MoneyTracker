@@ -27,7 +27,7 @@ public static partial class ThreadSafeBindingExtensions
         toStringConverter ??= value => value?.ToString() ?? string.Empty;
         fromStringConverter ??= CreateDefaultFromStringConverter<TProperty>();
 
-        // ✅ CORRECCIÓN: Clase nullable sin constraint
+        // ✅ FIX: Nullable class without constraint
         var currentRunnable = new AtomicReference<Java.Lang.Runnable>();
 
         void UpdateView()
@@ -61,7 +61,7 @@ public static partial class ThreadSafeBindingExtensions
         {
             textChangedHandler = (s, e) =>
             {
-                // ✅ CORRECCIÓN: Variable 'text' definida correctamente
+                // ✅ FIX: Properly defined 'text' variable
                 var text = e.Text?.ToString() ?? string.Empty;
 
                 var previousRunnable = currentRunnable.GetAndSet(null);
@@ -101,7 +101,7 @@ public static partial class ThreadSafeBindingExtensions
         );
     }
 
-    // ✅ CORRECCIÓN: AtomicReference sin nullable constraint
+    // ✅ FIX: AtomicReference without nullable constraint
 
 
     private static string GetPropertyName<T, TProperty>(Expression<Func<T, TProperty>> expression)

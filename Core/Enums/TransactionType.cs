@@ -1,17 +1,17 @@
 ﻿namespace MoneyTracker.Core.Enums;
 
 /// <summary>
-/// Tipos de transacciones que maneja la aplicación
+/// Transaction types handled by the application.
 /// </summary>
 public enum TransactionType
 {
     /// <summary>
-    /// Dinero que entra (salario, ventas, regalos)
+    /// Money coming in (salary, sales, gifts).
     /// </summary>
     Income = 1,
 
     /// <summary>
-    /// Dinero que sale (compras, servicios, entretenimiento)
+    /// Money going out (shopping, services, entertainment).
     /// </summary>
     Expense = 2
 }

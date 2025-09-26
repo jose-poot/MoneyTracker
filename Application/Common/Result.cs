@@ -1,7 +1,7 @@
 ﻿namespace MoneyTracker.Application.Common;
 
 /// <summary>
-/// Patrón Result para manejo explicito de errores sin excepciones
+/// Result pattern for explicit error handling without exceptions.
 /// </summary>
 public class Result
 {
@@ -26,7 +26,7 @@ public class Result
 }
 
 /// <summary>
-/// Result genérico que incluye datos
+/// Generic Result type that includes data.
 /// </summary>
 public class Result<T> : Result
 {

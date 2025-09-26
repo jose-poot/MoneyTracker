@@ -5,27 +5,27 @@ using MoneyTracker.Core.ValueObjects;
 namespace MoneyTracker.Core.Interfaces.Services;
 
 /// <summary>
-/// Servicio de dominio para lógica de negocio de transacciones
+/// Domain service interface for transaction business logic.
 /// </summary>
 public interface ITransactionService
 {
-    // Operaciones principales
+    // Core operations
     Task<Transaction> CreateTransactionAsync(string description, Money amount, TransactionType type, int categoryId,
         DateTime? date = null);
 
     Task<Transaction> UpdateTransactionAsync(Transaction transaction);
     Task<bool> DeleteTransactionAsync(int transactionId);
 
-    // Consultas
+    // Queries
     Task<List<Transaction>> GetAllTransactionsAsync();
     Task<List<Transaction>> GetTransactionsByPeriodAsync(DateTime startDate, DateTime endDate);
 
-    // Estadísticas
+    // Statistics
     Task<Money> GetCurrentBalanceAsync();
     Task<Money> GetMonthlyIncomeAsync(int year, int month);
     Task<Money> GetMonthlyExpensesAsync(int year, int month);
 
-    // Validaciones de negocio
+    // Business validations
     Task<bool> CanDeleteTransactionAsync(int transactionId);
     Task<(bool IsValid, List<string> Errors)> IsValidTransactionAsync(Transaction transaction);
 }

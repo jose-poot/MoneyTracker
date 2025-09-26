@@ -3,7 +3,7 @@
 namespace MoneyTracker.Core.Interfaces.Repositories;
 
 /// <summary>
-/// Repositorio específico para categorías
+/// Repository interface specialized for categories.
 /// </summary>
 public interface ICategoryRepository : IRepository<Category>
 {

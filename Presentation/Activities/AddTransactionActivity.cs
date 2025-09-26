@@ -4,7 +4,7 @@ using Android.Widget;
 
 namespace MoneyTracker.Presentation.Activities
 {
-    [Activity(Label = "Agregar Transacción")]
+[Activity(Label = "Add Transaction")]
     public class AddTransactionActivity : ActivityBase<AddTransactionViewModel>
     {
         protected override void OnCreate(Bundle? savedInstanceState)
@@ -21,7 +21,7 @@ namespace MoneyTracker.Presentation.Activities
 
             var set = CreateDataBindingSet();
 
-            // ✅ CORRECCIÓN: Cast explícito del ViewModel
+        // ✅ FIX: Explicit ViewModel cast
             set.Bind(editDescription).To<string>(vm => ((AddTransactionViewModel)vm).Description).TwoWay();
             set.Bind(editAmount).To<decimal>(vm => ((AddTransactionViewModel)vm).Amount).TwoWay();
             set.Bind(editNotes).To<string>(vm => ((AddTransactionViewModel)vm).Notes).TwoWay();

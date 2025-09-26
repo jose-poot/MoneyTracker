@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace MoneyTracker.Presentation.Collections;
 
 /// <summary>
-/// ObservableCollection optimizada para grandes datasets con virtualización y paginación
+/// ObservableCollection optimized for large datasets with virtualization and paging.
 /// </summary>
 public class VirtualizedObservableCollection<T> : INotifyCollectionChanged, INotifyPropertyChanged, IDisposable
 {

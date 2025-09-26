@@ -9,7 +9,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-		<!-- Errores de validación -->
+             <!-- Validation errors -->
 		<LinearLayout
             android:id="@+id/layout_validation_errors"
             android:layout_width="match_parent"
@@ -17,12 +17,12 @@
             android:orientation="vertical"
             android:visibility="gone" />
 
-		<!-- Descripción -->
+        <!-- Description -->
 		<com.google.android.material.textfield.TextInputLayout
             android:id="@+id/input_layout_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Descripción">
+            android:hint="Description">
 
 			<com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_description"
@@ -31,12 +31,12 @@
 
 		</com.google.android.material.textfield.TextInputLayout>
 
-		<!-- Monto -->
+        <!-- Amount -->
 		<com.google.android.material.textfield.TextInputLayout
             android:id="@+id/input_layout_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Monto">
+            android:hint="Amount">
 
 			<com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_amount"
@@ -46,7 +46,7 @@
 
 		</com.google.android.material.textfield.TextInputLayout>
 
-		<!-- Tipo de transacción -->
+        <!-- Transaction type -->
 		<LinearLayout
             android:id="@+id/chip_group_type"
             android:layout_width="match_parent"
@@ -57,55 +57,55 @@
                 android:id="@+id/chip_expense_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Gasto"
+                android:text="Expense"
                 android:checked="true" />
 
 			<RadioButton
                 android:id="@+id/chip_income_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ingreso" />
+                android:text="Income" />
 
 		</LinearLayout>
 
-		<!-- Categoría -->
+        <!-- Category -->
 		<Spinner
             android:id="@+id/spinner_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp" />
 
-		<!-- Fecha -->
+        <!-- Date -->
 		<EditText
             android:id="@+id/edit_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Fecha"
+            android:hint="Date"
             android:focusable="false" />
 
-		<!-- Notas -->
+        <!-- Notes -->
 		<EditText
             android:id="@+id/edit_notes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Notas (opcional)"
+            android:hint="Notes (optional)"
             android:inputType="textMultiLine" />
 
-		<!-- Ubicación -->
+        <!-- Location -->
 		<EditText
             android:id="@+id/edit_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ubicación (opcional)" />
+            android:hint="Location (optional)" />
 
-		<!-- Recurrente -->
+        <!-- Recurring -->
 		<CheckBox
             android:id="@+id/checkbox_recurring"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Transacción recurrente" />
+            android:text="Recurring transaction" />
 
-		<!-- Botones -->
+        <!-- Buttons -->
 		<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -116,14 +116,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Cancelar" />
+                android:text="Cancel" />
 
 			<Button
                 android:id="@+id/button_save"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Guardar" />
+                android:text="Save" />
 
 		</LinearLayout>
 

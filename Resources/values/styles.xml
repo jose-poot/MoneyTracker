@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- Tema principal -->
+        <!-- Primary theme -->
 	<style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
 		<item name="colorPrimary">@color/colorPrimary</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -12,20 +12,20 @@
 		<item name="colorPrimaryDark">#1976D2</item>
 		<item name="colorAccent">#FF4081</item>
 	</style>
-	<!-- Estilos para formularios -->
+        <!-- Styles for forms -->
 	<style name="FormTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 		<item name="boxStrokeColor">@color/colorPrimary</item>
 		<item name="hintTextColor">@color/colorPrimary</item>
 	</style>
 
-	<!-- Estilos para botones -->
+        <!-- Styles for buttons -->
 	<style name="PrimaryButton" parent="Widget.MaterialComponents.Button">
 		<item name="backgroundTint">@color/colorPrimary</item>
 		<item name="android:textColor">@android:color/white</item>
 		<item name="cornerRadius">8dp</item>
 	</style>
 
-	<!-- Estilos para cards -->
+        <!-- Styles for cards -->
 	<style name="TransactionCard" parent="Widget.MaterialComponents.CardView">
 		<item name="cardCornerRadius">8dp</item>
 		<item name="cardElevation">2dp</item>

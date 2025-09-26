@@ -4,7 +4,7 @@ using MoneyTracker.Core.ValueObjects;
 namespace MoneyTracker.Core.Entities;
 
 /// <summary>
-/// Transacción financiera (ingreso o gasto)
+/// Financial transaction (income or expense).
 /// </summary>
 public class Transaction
 {
@@ -15,7 +15,7 @@ public class Transaction
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
-    // Value Object para manejar dinero de forma segura
+    // Value Object used to handle money safely
     private Money _amount = new(0);
     public Money Amount
     {
@@ -23,7 +23,7 @@ public class Transaction
         set => _amount = value ?? throw new ArgumentNullException(nameof(value));
     }
 
-    // Para compatibilidad con Entity Framework
+    // Required for Entity Framework compatibility
     public decimal AmountValue
     {
         get => Amount.Amount;
@@ -36,58 +36,58 @@ public class Transaction
         set => _amount = new Money(Amount.Amount, value);
     }
 
-    // Relación con categoría
+    // Relationship with category
     public int CategoryId { get; set; }
     public virtual Category Category { get; set; } = null!;
 
-    // Campos opcionales para funcionalidad avanzada
+    // Optional fields for advanced functionality
     public string? Notes { get; set; }
     public string? Location { get; set; }
     public bool IsRecurring { get; set; } = false;
 
     /// <summary>
-    /// Valida que la transacción tenga datos válidos según reglas de negocio
+    /// Validates that the transaction contains valid data according to business rules.
     /// </summary>
     public bool IsValid(out List<string> errors)
     {
         errors = new List<string>();
 
-        // Regla 1: Descripción obligatoria
+        // Rule 1: Description is required
         if (string.IsNullOrWhiteSpace(Description))
-            errors.Add("La descripción es obligatoria");
+            errors.Add("The description is required");
 
-        // Regla 2: Descripción no muy larga
+        // Rule 2: Description not too long
         if (Description.Length > 200)
-            errors.Add("La descripción no puede tener más de 200 caracteres");
+            errors.Add("The description cannot exceed 200 characters");
 
-        // Regla 3: Monto válido según tipo de transacción
+        // Rule 3: Amount must be valid for the transaction type
         if (Type == TransactionType.Expense && Amount.Amount > 0)
-            errors.Add("Los gastos deben tener monto negativo o usar CreateExpense()");
+            errors.Add("Expenses must have a negative amount or use CreateExpense().");
 
         if (Type == TransactionType.Income && Amount.Amount < 0)
-            errors.Add("Los ingresos deben tener monto positivo");
+            errors.Add("Income must have a positive amount.");
 
-        // Regla 4: Monto no puede ser cero
+        // Rule 4: Amount cannot be zero
         if (Amount.IsZero)
-            errors.Add("El monto no puede ser cero");
+            errors.Add("The amount cannot be zero");
 
-        // Regla 5: Fecha no puede ser futura para gastos reales
+        // Rule 5: The date cannot be in the future for actual transactions
         if (Date > DateTime.UtcNow.AddDays(1) && !IsRecurring)
-            errors.Add("La fecha no puede ser futura para transacciones reales");
+            errors.Add("The date cannot be in the future for actual transactions");
 
-        // Regla 6: Debe tener categoría
+        // Rule 6: Must have a category
         if (CategoryId <= 0)
-            errors.Add("Debe seleccionar una categoría");
+            errors.Add("A category must be selected");
 
         return errors.Count == 0;
     }
 
     /// <summary>
-    /// Factory method para crear un gasto
+    /// Factory method used to create an expense transaction.
     /// </summary>
     public static Transaction CreateExpense(string description, Money amount, int categoryId, DateTime? date = null)
     {
-        // Convertimos a monto negativo para gastos
+        // Force a negative amount for expenses
         var expenseAmount = new Money(-Math.Abs(amount.Amount), amount.Currency);
 
         return new Transaction
@@ -101,11 +101,11 @@ public class Transaction
     }
 
     /// <summary>
-    /// Factory method para crear un ingreso
+    /// Factory method used to create an income transaction.
     /// </summary>
     public static Transaction CreateIncome(string description, Money amount, int categoryId, DateTime? date = null)
     {
-        // Los ingresos siempre son positivos
+        // Income amounts are always positive
         var incomeAmount = new Money(Math.Abs(amount.Amount), amount.Currency);
 
         return new Transaction
@@ -119,22 +119,22 @@ public class Transaction
     }
 
     /// <summary>
-    /// Indica si es un gasto
+    /// Indicates whether the transaction is an expense.
     /// </summary>
     public bool IsExpense => Type == TransactionType.Expense;
 
     /// <summary>
-    /// Indica si es un ingreso
+    /// Indicates whether the transaction is an income.
     /// </summary>
     public bool IsIncome => Type == TransactionType.Income;
 
     /// <summary>
-    /// Obtiene el monto absoluto (sin signo)
+    /// Returns the absolute amount (without sign).
     /// </summary>
     public Money GetAbsoluteAmount() => new(Math.Abs(Amount.Amount), Amount.Currency);
 
     /// <summary>
-    /// Cambia el tipo de transacción ajustando el signo del monto
+    /// Changes the transaction type adjusting the amount sign.
     /// </summary>
     public void ChangeType(TransactionType newType)
     {
@@ -151,7 +151,7 @@ public class Transaction
     }
 
     /// <summary>
-    /// Marca la transacción como modificada
+    /// Marks the transaction as modified.
     /// </summary>
     public void MarkAsUpdated()
     {

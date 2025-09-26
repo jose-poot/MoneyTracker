@@ -19,13 +19,13 @@ namespace MoneyTracker.Presentation.Activities
         //    var txtUser = FindViewById<EditText>(Resource.Id.txtUserName)!;
         //    var btnSave = FindViewById<Button>(Resource.Id.btnSave)!;
 
-        //    // ✅ Usar el comando generado, no el método directamente
+        //    // ✅ Use the generated command instead of calling the method directly
         //    await ViewModel.LoadAsyncCommand.ExecuteAsync(null);
 
         //    var set = new BindingSet<SettingsViewModel>(ViewModel);
         //    set.BindText(txtUser, vm => vm.UserName, (vm, v) => vm.UserName = v ?? string.Empty);
 
-        //    // ✅ Usar el comando correcto que se genera automáticamente
+        //    // ✅ Use the auto-generated command
         //    set.BindClick(btnSave, ViewModel.SaveAsyncCommand);
         }
     }

@@ -7,7 +7,7 @@ using MoneyTracker.Core.Interfaces.Repositories;
 namespace MoneyTracker.Application.Services;
 
 /// <summary>
-/// Servicio de aplicación para categorías
+/// Application service for categories.
 /// </summary>
 public class CategoryAppService
 {
@@ -29,7 +29,7 @@ public class CategoryAppService
     }
 
     /// <summary>
-    /// Obtiene todas las categorías activas
+    /// Retrieves all active categories.
     /// </summary>
     public async Task<List<CategoryDto>> GetActiveCategoriesAsync()
     {
@@ -38,14 +38,14 @@ public class CategoryAppService
     }
 
     /// <summary>
-    /// Obtiene todas las categorías con estadísticas
+    /// Retrieves all categories with statistics.
     /// </summary>
     public async Task<List<CategoryDto>> GetCategoriesWithStatsAsync()
     {
         var categories = await _categoryRepository.GetCategoriesWithTransactionsAsync();
         var categoryDtos = _mapper.Map<List<CategoryDto>>(categories);
 
-        // Calcular estadísticas adicionales
+        // Calculate additional statistics
         foreach (var categoryDto in categoryDtos)
         {
             var transactions = await _transactionRepository.GetByCategoryAsync(categoryDto.Id);
@@ -58,11 +58,11 @@ public class CategoryAppService
     }
 
     /// <summary>
-    /// Crea una nueva categoría
+    /// Creates a new category.
     /// </summary>
     public async Task<(bool Success, CategoryDto? Category, List<string> Errors)> CreateCategoryAsync(CategoryDto categoryDto)
     {
-        // 1. Validar
+        // 1. Validate the input
         var validationResult = await _validator.ValidateAsync(categoryDto);
         if (!validationResult.IsValid)
         {
@@ -72,16 +72,16 @@ public class CategoryAppService
 
         try
         {
-            // 2. Convertir a entidad
+            // 2. Convert to an entity
             var category = _mapper.Map<Category>(categoryDto);
 
-            // 3. Validar reglas de dominio
+            // 3. Validate domain rules
             if (!category.IsValid(out var domainErrors))
             {
                 return (false, null, domainErrors);
             }
 
-            // 4. Guardar
+            // 4. Persist the entity
             var savedCategory = await _categoryRepository.AddAsync(category);
             var resultDto = _mapper.Map<CategoryDto>(savedCategory);
 
@@ -89,13 +89,13 @@ public class CategoryAppService
         }
         catch (Exception ex)
         {
-            var errorMessage = "Error al crear la categoría: " + ex.Message;
+            var errorMessage = "Error creating the category: " + ex.Message;
             return (false, null, new List<string> { errorMessage });
         }
     }
 
     /// <summary>
-    /// Inicializa categorías predeterminadas si no existen
+    /// Initializes default categories if they do not exist.
     /// </summary>
     public async Task<int> InitializeDefaultCategoriesAsync()
     {
@@ -104,7 +104,7 @@ public class CategoryAppService
             var existingCategories = await _categoryRepository.GetAllAsync();
             if (existingCategories.Any())
             {
-                return 0; // Ya hay categorías
+                return 0; // Categories already exist
             }
 
             var defaultCategories = Category.GetDefaultCategories();
@@ -127,36 +127,36 @@ public class CategoryAppService
     }
 
     /// <summary>
-    /// Elimina una categoría si no tiene transacciones
+    /// Deletes a category if it has no transactions.
     /// </summary>
     public async Task<(bool Success, List<string> Errors)> DeleteCategoryAsync(int id)
     {
         try
         {
-            // 1. Verificar que existe
+            // 1. Ensure it exists
             var category = await _categoryRepository.GetByIdAsync(id);
             if (category == null)
             {
-                return (false, new List<string> { "La categoría no existe" });
+                return (false, new List<string> { "The category does not exist" });
             }
 
-            // 2. Verificar que no tiene transacciones
+            // 2. Ensure it does not have transactions
             var hasTransactions = await _categoryRepository.HasTransactionsAsync(id);
             if (hasTransactions)
             {
-                return (false, new List<string> { "No se puede eliminar una categoría que tiene transacciones" });
+                return (false, new List<string> { "Cannot delete a category that has transactions" });
             }
 
-            // 3. Eliminar
+            // 3. Delete
             var deleted = await _categoryRepository.DeleteAsync(id);
 
             return deleted
                 ? (true, new List<string>())
-                : (false, new List<string> { "Error al eliminar la categoría" });
+                : (false, new List<string> { "Error deleting the category" });
         }
         catch (Exception ex)
         {
-            var errorMessage = "Error al eliminar la categoría: " + ex.Message;
+            var errorMessage = "Error deleting the category: " + ex.Message;
             return (false, new List<string> { errorMessage });
         }
     }

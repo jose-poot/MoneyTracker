@@ -4,12 +4,12 @@ using MoneyTracker.Core.ValueObjects;
 namespace MoneyTracker.Core.Services;
 
 /// <summary>
-/// Servicio de dominio para cálculos financieros complejos
+/// Domain service for complex financial calculations.
 /// </summary>
 public class MoneyCalculatorService
 {
     /// <summary>
-    /// Calcula el balance total de una lista de transacciones
+    /// Calculates the total balance for a list of transactions.
     /// </summary>
     public Money CalculateBalance(IEnumerable<Transaction> transactions, string currency = "USD")
     {
@@ -20,7 +20,7 @@ public class MoneyCalculatorService
 
         foreach (var transaction in transactions)
         {
-            // Los ingresos suman, los gastos restan
+            // Income adds, expenses subtract
             if (transaction.Type == Core.Enums.TransactionType.Income)
                 total += Math.Abs(transaction.Amount.Amount);
             else
@@ -31,7 +31,7 @@ public class MoneyCalculatorService
     }
 
     /// <summary>
-    /// Calcula estadísticas de un período
+    /// Calculates statistics for a period.
     /// </summary>
     public (Money TotalIncome, Money TotalExpenses, Money Balance) CalculatePeriodStats(
         IEnumerable<Transaction> transactions,
@@ -59,7 +59,7 @@ public class MoneyCalculatorService
     }
 
     /// <summary>
-    /// Agrupa transacciones por categoría con totales
+    /// Groups transactions by category with totals.
     /// </summary>
     public Dictionary<Category, Money> GroupByCategory(
         IEnumerable<Transaction> transactions,

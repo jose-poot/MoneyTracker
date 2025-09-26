@@ -1,42 +1,42 @@
 <resources>
 	<string name="app_name">MoneyTracker</string>
-	<string name="navigation_drawer_open">Abrir menú</string>
-	<string name="navigation_drawer_close">Cerrar menú</string>
-	<string name="action_settings">Configuración</string>
+        <string name="navigation_drawer_open">Open menu</string>
+        <string name="navigation_drawer_close">Close menu</string>
+        <string name="action_settings">Settings</string>
 
-	<!-- Títulos -->
-	<string name="title_transactions">Transacciones</string>
-	<string name="title_add_transaction">Nueva Transacción</string>
-	<string name="title_edit_transaction">Editar Transacción</string>
-	<string name="title_categories">Categorías</string>
-	<string name="title_summary">Resumen</string>
+        <!-- Titles -->
+        <string name="title_transactions">Transactions</string>
+        <string name="title_add_transaction">New Transaction</string>
+        <string name="title_edit_transaction">Edit Transaction</string>
+        <string name="title_categories">Categories</string>
+        <string name="title_summary">Summary</string>
 
-	<!-- Botones -->
-	<string name="button_save">Guardar</string>
-	<string name="button_cancel">Cancelar</string>
-	<string name="button_delete">Eliminar</string>
-	<string name="button_edit">Editar</string>
-        <string name="button_add">Agregar</string>
+        <!-- Buttons -->
+        <string name="button_save">Save</string>
+        <string name="button_cancel">Cancel</string>
+        <string name="button_delete">Delete</string>
+        <string name="button_edit">Edit</string>
+        <string name="button_add">Add</string>
 
-        <!-- Filtros de transacciones -->
-        <string name="transaction_filter_category_prompt">Selecciona una categoría</string>
-        <string name="transaction_filter_recurring">Solo recurrentes</string>
-        <string name="transaction_filter_all">Todas</string>
-        <string name="transaction_filter_income">Ingresos</string>
-        <string name="transaction_filter_expense">Gastos</string>
-        <string name="transaction_filter_all_dates">Mostrando: Todas las fechas</string>
-        <string name="transaction_filter_all_dates_short">Todo</string>
-        <string name="transaction_filter_current_month">Este mes</string>
-        <string name="transaction_filter_last_30">Últimos 30 días</string>
-        <string name="transaction_insights_placeholder">Agrega transacciones para descubrir tus patrones de gasto.</string>
+        <!-- Transaction filters -->
+        <string name="transaction_filter_category_prompt">Select a category</string>
+        <string name="transaction_filter_recurring">Recurring only</string>
+        <string name="transaction_filter_all">All</string>
+        <string name="transaction_filter_income">Income</string>
+        <string name="transaction_filter_expense">Expenses</string>
+        <string name="transaction_filter_all_dates">Showing: All dates</string>
+        <string name="transaction_filter_all_dates_short">All</string>
+        <string name="transaction_filter_current_month">This month</string>
+        <string name="transaction_filter_last_30">Last 30 days</string>
+        <string name="transaction_insights_placeholder">Add transactions to discover your spending patterns.</string>
 
-        <!-- Mensajes -->
-        <string name="message_transaction_saved">Transacción guardada correctamente</string>
-	<string name="message_transaction_deleted">Transacción eliminada</string>
-	<string name="message_confirm_delete">¿Estás seguro de que quieres eliminar esta transacción?</string>
+        <!-- Messages -->
+        <string name="message_transaction_saved">Transaction saved successfully</string>
+        <string name="message_transaction_deleted">Transaction deleted</string>
+        <string name="message_confirm_delete">Are you sure you want to delete this transaction?</string>
 
-	<!-- Errores -->
-	<string name="error_required_field">Este campo es obligatorio</string>
-	<string name="error_invalid_amount">Monto inválido</string>
-	<string name="error_connection">Error de conexión</string>
+        <!-- Errors -->
+        <string name="error_required_field">This field is required</string>
+        <string name="error_invalid_amount">Invalid amount</string>
+        <string name="error_connection">Connection error</string>
 </resources>

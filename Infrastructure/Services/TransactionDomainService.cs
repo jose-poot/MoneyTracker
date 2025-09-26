@@ -7,7 +7,7 @@ using MoneyTracker.Core.ValueObjects;
 namespace MoneyTracker.Infrastructure.Services;
 
 /// <summary>
-/// Implementación del servicio de dominio para transacciones
+/// Domain service implementation for transactions.
 /// </summary>
 public class TransactionDomainService : ITransactionService
 {
@@ -29,43 +29,43 @@ public class TransactionDomainService : ITransactionService
         int categoryId,
         DateTime? date = null)
     {
-        // 1. Validar que la categoría existe y está activa
+        // 1. Validate that the category exists and is active
         var category = await _categoryRepository.GetByIdAsync(categoryId);
         if (category == null)
-            throw new ArgumentException("La categoría no existe", nameof(categoryId));
+            throw new ArgumentException("The category does not exist", nameof(categoryId));
 
         if (!category.IsActive)
-            throw new ArgumentException("La categoría está inactiva", nameof(categoryId));
+            throw new ArgumentException("The category is inactive", nameof(categoryId));
 
-        // 2. Crear transacción usando factory methods del dominio
+        // 2. Create the transaction using domain factory methods
         var transaction = type == TransactionType.Expense
             ? Transaction.CreateExpense(description, amount, categoryId, date)
             : Transaction.CreateIncome(description, amount, categoryId, date);
 
-        // 3. Validar reglas de dominio
+        // 3. Validate domain rules
         if (!transaction.IsValid(out var errors))
         {
-            throw new ArgumentException($"Transacción inválida: {string.Join(", ", errors)}");
+            throw new ArgumentException($"Invalid transaction: {string.Join(", ", errors)}");
         }
 
-        // 4. Guardar
+        // 4. Persist the transaction
         return await _transactionRepository.AddAsync(transaction);
     }
 
     public async Task<Transaction> UpdateTransactionAsync(Transaction transaction)
     {
-        // 1. Validar que existe
+        // 1. Ensure the transaction exists
         var existing = await _transactionRepository.GetByIdAsync(transaction.Id);
         if (existing == null)
-            throw new ArgumentException("La transacción no existe");
+            throw new ArgumentException("The transaction does not exist");
 
-        // 2. Validar reglas de dominio
+        // 2. Validate domain rules
         if (!transaction.IsValid(out var errors))
         {
-            throw new ArgumentException($"Transacción inválida: {string.Join(", ", errors)}");
+            throw new ArgumentException($"Invalid transaction: {string.Join(", ", errors)}");
         }
 
-        // 3. Actualizar
+        // 3. Apply the update
         transaction.MarkAsUpdated();
         return await _transactionRepository.UpdateAsync(transaction);
     }
@@ -108,8 +108,8 @@ public class TransactionDomainService : ITransactionService
 
     public async Task<bool> CanDeleteTransactionAsync(int transactionId)
     {
-        // Por ahora, todas las transacciones se pueden eliminar
-        // En el futuro podrían haber restricciones (ej: transacciones auditadas)
+        // For now all transactions can be deleted
+        // Future restrictions may be added (for example: audited transactions)
         var transaction = await _transactionRepository.GetByIdAsync(transactionId);
         return transaction != null;
     }
@@ -118,18 +118,18 @@ public class TransactionDomainService : ITransactionService
     {
         var errors = new List<string>();
 
-        // Validaciones del dominio
+        // Domain-level validations
         if (!transaction.IsValid(out var domainErrors))
         {
             errors.AddRange(domainErrors);
         }
 
-        // Validaciones que requieren repositorio
+        // Repository-dependent validations
         var category = await _categoryRepository.GetByIdAsync(transaction.CategoryId);
         if (category == null)
-            errors.Add("La categoría no existe");
+            errors.Add("The category does not exist");
         else if (!category.IsActive)
-            errors.Add("La categoría está inactiva");
+            errors.Add("The category is inactive");
 
         return (errors.Count == 0, errors);
     }

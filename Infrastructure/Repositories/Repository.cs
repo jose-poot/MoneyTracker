@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 namespace MoneyTracker.Infrastructure.Repositories;
 
 /// <summary>
-/// Implementación base del patrón Repository usando Entity Framework
+/// Base implementation of the Repository pattern using Entity Framework.
 /// </summary>
 public class Repository<T> : IRepository<T> where T : class
 {

@@ -5,17 +5,17 @@ using MoneyTracker.Core.Entities;
 namespace MoneyTracker.Infrastructure.Configurations;
 
 /// <summary>
-/// Configuración de Entity Framework para la entidad Category
+/// Entity Framework configuration for the Category entity.
 /// </summary>
 public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(EntityTypeBuilder<Category> builder)
     {
-        // Configuración de tabla
+        // Table configuration
         builder.ToTable("Categories");
         builder.HasKey(c => c.Id);
 
-        // Propiedades principales
+        // Primary properties
         builder.Property(c => c.Id)
             .IsRequired()
             .ValueGeneratedOnAdd();
@@ -23,44 +23,44 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(c => c.Name)
             .IsRequired()
             .HasMaxLength(50)
-            .HasComment("Nombre de la categoría");
+            .HasComment("Category name");
 
         builder.Property(c => c.Description)
             .HasMaxLength(200)
-            .HasComment("Descripción de la categoría");
+            .HasComment("Category description");
 
         builder.Property(c => c.Color)
             .IsRequired()
             .HasMaxLength(7) // #RRGGBB
             .HasDefaultValue("#2196F3")
-            .HasComment("Color en formato hexadecimal");
+            .HasComment("Hexadecimal color value");
 
         builder.Property(c => c.Icon)
             .IsRequired()
             .HasMaxLength(50)
             .HasDefaultValue("category")
-            .HasComment("Nombre del icono");
+            .HasComment("Icon name");
 
         builder.Property(c => c.IsActive)
             .IsRequired()
             .HasDefaultValue(true)
-            .HasComment("Indica si la categoría está activa");
+            .HasComment("Indicates whether the category is active");
 
         builder.Property(c => c.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime")
             .HasDefaultValueSql("datetime('now')")
-            .HasComment("Fecha de creación");
+            .HasComment("Creation date");
 
-        // Restricciones únicas
+        // Unique constraints
         builder.HasIndex(c => c.Name)
             .IsUnique()
             .HasDatabaseName("IX_Category_Name_Unique");
 
-        // Índices para performance
+        // Indexes for performance
         builder.HasIndex(c => c.IsActive)
             .HasDatabaseName("IX_Category_IsActive");
 
-        // Relación con Transactions configurada desde TransactionConfiguration
+        // Relationship with Transactions configured in TransactionConfiguration
     }
 }

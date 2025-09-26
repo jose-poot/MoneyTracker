@@ -8,7 +8,7 @@ using Profile = AutoMapper.Profile;
 namespace MoneyTracker.Application.Mappings;
 
 /// <summary>
-/// Perfil de AutoMapper que define cómo convertir entre entidades y DTOs
+/// AutoMapper profile that defines how to convert between entities and DTOs.
 /// </summary>
 public class MappingProfile : Profile
 {
@@ -40,7 +40,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
 
-        // Para actualización: TransactionDto → Transaction
+        // For updates: TransactionDto → Transaction
         CreateMap<TransactionDto, Transaction>()
             .ForMember(dest => dest.Amount, opt => opt.MapFrom(src =>
                 new Money(src.Amount, src.Currency)))
@@ -59,7 +59,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
             .ForMember(dest => dest.CanDelete, opt => opt.MapFrom(src => src.Transactions.Count == 0));
 
-        // CategoryDto → Category Entity (para crear/actualizar)
+        // CategoryDto → Category entity (for create/update scenarios)
         CreateMap<CategoryDto, Category>()
             .ForMember(dest => dest.Id, opt => opt.Condition(src => src.Id > 0))
             .ForMember(dest => dest.Transactions, opt => opt.Ignore())
@@ -68,7 +68,7 @@ public class MappingProfile : Profile
 
     private void ConfigureUserMappings()
     {
-        // User mappings (para futuro)
+        // User mappings (reserved for future features)
         CreateMap<User, UserSettingsDto>();
         CreateMap<UserSettingsDto, User>();
     }

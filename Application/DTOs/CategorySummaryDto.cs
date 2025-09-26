@@ -1,7 +1,7 @@
 ﻿namespace MoneyTracker.Application.DTOs;
 
 /// <summary>
-/// DTO para resumen por categoría
+/// DTO representing per-category summaries.
 /// </summary>
 public class CategorySummaryDto
 {

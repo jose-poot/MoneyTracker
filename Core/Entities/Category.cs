@@ -1,36 +1,36 @@
 ﻿namespace MoneyTracker.Core.Entities;
 
 /// <summary>
-/// Categoría para clasificar transacciones (Comida, Transporte, etc.)
+/// Category used to classify transactions (Food, Transport, etc.).
 /// </summary>
 public class Category
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Color { get; set; } = "#2196F3"; // Color en formato hexadecimal
-    public string Icon { get; set; } = "category"; // Nombre del icono
+    public string Color { get; set; } = "#2196F3"; // Hexadecimal color value
+    public string Icon { get; set; } = "category"; // Icon name
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Relación: Una categoría puede tener muchas transacciones
+    // Relationship: A category can have many transactions
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
     /// <summary>
-    /// Valida que la categoría tenga datos válidos
+    /// Validates that the category contains valid data.
     /// </summary>
     public bool IsValid(out List<string> errors)
     {
         errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(Name))
-            errors.Add("El nombre de la categoría es obligatorio");
+            errors.Add("The category name is required");
 
         if (Name.Length > 50)
-            errors.Add("El nombre no puede tener más de 50 caracteres");
+            errors.Add("The name cannot exceed 50 characters");
 
         if (!IsValidColor(Color))
-            errors.Add("El color debe estar en formato hexadecimal (#RRGGBB)");
+            errors.Add("Color must be in hexadecimal format (#RRGGBB)");
 
         return errors.Count == 0;
     }
@@ -41,7 +41,7 @@ public class Category
         if (!color.StartsWith("#")) return false;
         if (color.Length != 7) return false;
 
-        // Verifica que sean caracteres hexadecimales válidos
+        // Ensure the characters are valid hexadecimal digits
         for (int i = 1; i < color.Length; i++)
         {
             char c = color[i];
@@ -53,20 +53,20 @@ public class Category
     }
 
     /// <summary>
-    /// Crea categorías predeterminadas del sistema
+    /// Creates the system default categories.
     /// </summary>
     public static List<Category> GetDefaultCategories()
     {
         return new List<Category>
-            {
-                new() { Name = "Alimentación", Description = "Comida y bebidas", Color = "#FF9800", Icon = "restaurant" },
-                new() { Name = "Transporte", Description = "Gasolina, transporte público", Color = "#2196F3", Icon = "directions_car" },
-                new() { Name = "Entretenimiento", Description = "Cine, juegos, salidas", Color = "#E91E63", Icon = "movie" },
-                new() { Name = "Servicios", Description = "Luz, agua, internet", Color = "#4CAF50", Icon = "build" },
-                new() { Name = "Salud", Description = "Medicinas, consultas", Color = "#F44336", Icon = "local_hospital" },
-                new() { Name = "Educación", Description = "Libros, cursos", Color = "#9C27B0", Icon = "school" },
-                new() { Name = "Ingresos", Description = "Salario, ventas", Color = "#4CAF50", Icon = "attach_money" }
-            };
+        {
+            new() { Name = "Food", Description = "Meals and beverages", Color = "#FF9800", Icon = "restaurant" },
+            new() { Name = "Transport", Description = "Fuel, public transport", Color = "#2196F3", Icon = "directions_car" },
+            new() { Name = "Entertainment", Description = "Movies, games, outings", Color = "#E91E63", Icon = "movie" },
+            new() { Name = "Utilities", Description = "Electricity, water, internet", Color = "#4CAF50", Icon = "build" },
+            new() { Name = "Health", Description = "Medicine, appointments", Color = "#F44336", Icon = "local_hospital" },
+            new() { Name = "Education", Description = "Books, courses", Color = "#9C27B0", Icon = "school" },
+            new() { Name = "Income", Description = "Salary, sales", Color = "#4CAF50", Icon = "attach_money" }
+        };
     }
 
     public override string ToString() => Name;

@@ -1,13 +1,13 @@
 ﻿namespace MoneyTracker.Core.ValueObjects;
 
 /// <summary>
-/// Value Object que representa dinero con validaciones de negocio
+/// Value Object that represents money with business validations.
 /// </summary>
 /// <remarks>
-/// ¿Por qué un Value Object y no solo decimal?
-/// - Encapsula lógica de validación
-/// - Evita errores comunes (dinero negativo donde no debe)
-/// - Más expresivo que un decimal simple
+/// Why a Value Object instead of a plain decimal?
+/// - Encapsulates validation logic
+/// - Prevents common errors (negative amounts where not allowed)
+/// - More expressive than a simple decimal
 /// </remarks>
 public class Money : IEquatable<Money>
 {
@@ -15,62 +15,62 @@ public class Money : IEquatable<Money>
     public string Currency { get; }
 
     /// <summary>
-    /// Constructor que valida que el dinero sea válido
+    /// Constructor that validates the money value.
     /// </summary>
     public Money(decimal amount, string currency = "USD")
     {
         if (string.IsNullOrWhiteSpace(currency))
-            throw new ArgumentException("La moneda no puede estar vacía", nameof(currency));
+            throw new ArgumentException("Currency cannot be empty", nameof(currency));
 
         Amount = amount;
         Currency = currency.ToUpperInvariant();
     }
 
     /// <summary>
-    /// Crea dinero positivo (para ingresos)
+    /// Creates positive money (for income).
     /// </summary>
     public static Money CreatePositive(decimal amount, string currency = "USD")
     {
         if (amount < 0)
-            throw new ArgumentException("El monto debe ser positivo", nameof(amount));
+            throw new ArgumentException("The amount must be positive", nameof(amount));
 
         return new Money(amount, currency);
     }
 
     /// <summary>
-    /// Verifica si el monto es positivo
+    /// Checks if the amount is positive.
     /// </summary>
     public bool IsPositive => Amount > 0;
 
     /// <summary>
-    /// Verifica si el monto es cero
+    /// Checks if the amount is zero.
     /// </summary>
     public bool IsZero => Amount == 0;
 
     /// <summary>
-    /// Suma dos cantidades de dinero
+    /// Adds two monetary values.
     /// </summary>
     public Money Add(Money other)
     {
         if (Currency != other.Currency)
-            throw new InvalidOperationException($"No se pueden sumar monedas diferentes: {Currency} y {other.Currency}");
+            throw new InvalidOperationException($"Cannot add different currencies: {Currency} and {other.Currency}");
 
         return new Money(Amount + other.Amount, Currency);
     }
 
     /// <summary>
-    /// Resta dos cantidades de dinero  
+    /// Subtracts two monetary values.
     /// </summary>
     public Money Subtract(Money other)
     {
         if (Currency != other.Currency)
-            throw new InvalidOperationException($"No se pueden restar monedas diferentes: {Currency} y {other.Currency}");
+            throw new InvalidOperationException($"Cannot subtract different currencies: {Currency} and {other.Currency}");
 
         return new Money(Amount - other.Amount, Currency);
     }
 
     /// <summary>
-    /// Formatea el dinero para mostrar en UI
+    /// Formats the money value for UI display.
     /// </summary>
     public string ToDisplayString()
     {
@@ -83,7 +83,7 @@ public class Money : IEquatable<Money>
         };
     }
 
-    // Implementación de IEquatable para comparaciones
+    // IEquatable implementation for comparisons
     public bool Equals(Money? other)
     {
         if (other is null) return false;
@@ -96,7 +96,7 @@ public class Money : IEquatable<Money>
 
     public override string ToString() => ToDisplayString();
 
-    // Operadores sobrecargados para facilitar el uso
+    // Overloaded operators for easier usage
     public static Money operator +(Money left, Money right) => left.Add(right);
     public static Money operator -(Money left, Money right) => left.Subtract(right);
     public static bool operator ==(Money left, Money right) => left?.Equals(right) ?? right is null;

@@ -26,7 +26,7 @@ internal class ViewPropertyBinding<TView, TViewModel> : IViewBinding<TView>, IBi
 
     public IBindingTarget<TView> To<TProperty>(Expression<Func<object, TProperty>> vmProperty)
     {
-        // Para propiedades específicas de la vista (como Enabled, Visibility, etc.)
+        // For view-specific properties (such as Enabled, Visibility, etc.)
         var binding = new ViewSpecificPropertyBinding<TView, TViewModel, TProperty>(
             _view, _viewProperty, _viewModel, vmProperty);
         _bindingSet.AddBinding(binding);

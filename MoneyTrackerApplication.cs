@@ -15,8 +15,8 @@ using System.IO;
 namespace MoneyTracker;
 
 /// <summary>
-/// Clase Application que configura toda la inyección de dependencias
-/// Se ejecuta cuando inicia la aplicación Android
+/// Application class that configures dependency injection for the app.
+/// Runs when the Android application starts.
 /// </summary>
 [Application]
 public class MoneyTrackerApplication : Android.App.Application
@@ -38,22 +38,22 @@ public class MoneyTrackerApplication : Android.App.Application
             _currentActivityProvider = new CurrentActivityProvider();
             RegisterActivityLifecycleCallbacks(_currentActivityProvider);
 
-            // Configurar inyección de dependencias
+            // Configure dependency injection
             ConfigureServices();
 
-            // Inicializar base de datos
+            // Initialize the database
             _ = InitializeDatabaseAsync();
         }
         catch (Exception ex)
         {
-            // Log crítico - la app no puede continuar sin DI
+            // Critical log - the app cannot continue without DI
             System.Diagnostics.Debug.WriteLine($"CRITICAL ERROR initializing app: {ex}");
             throw;
         }
     }
 
     /// <summary>
-    /// Configura todos los servicios de la aplicación
+    /// Configures every service required by the application.
     /// </summary>
     private void ConfigureServices()
     {
@@ -70,70 +70,68 @@ public class MoneyTrackerApplication : Android.App.Application
 #endif
         });
 
-        // Configurar ruta de base de datos
+        // Configure database path
         var dbPath = GetDatabasePath();
         var connectionString = $"Data Source={dbPath}";
  
         if (_currentActivityProvider == null)
         {
-            throw new InvalidOperationException("El proveedor de actividad actual no ha sido inicializado.");
+            throw new InvalidOperationException("The current activity provider has not been initialized.");
         }
 
         services.AddSingleton<Func<Activity>>(_ => () => _currentActivityProvider.GetCurrentActivity());
         services.AddSingleton<Func<Context>>(sp => () => sp.GetRequiredService<Func<Activity>>()());
         services.AddSingleton<IDialogService>(sp => new AndroidDialogService(sp.GetRequiredService<Func<Context>>()));
         services.AddSingleton<INavigationService>(sp => new AndroidNavigationService(sp.GetRequiredService<Func<Activity>>()));
-        services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext ?? throw new InvalidOperationException("ApplicationContext no disponible")));
+        services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext ?? throw new InvalidOperationException("ApplicationContext is not available")));
         services.AddSingleton<IMediaPickerService>(sp => new AndroidMediaPickerService(sp.GetRequiredService<Func<Activity>>()));
-        services.AddSingleton<MoneyTracker.Presentation.Navigation.INavigator, MoneyTracker.Presentation.Navigation.Navigator>();
-
         // ViewModels
         services.AddTransient<MoneyTracker.Presentation.ViewModels.SettingsViewModel>();
         services.AddScoped<UserAppService>();
-        // Registrar todos los servicios de Infrastructure
+        // Register every Infrastructure service
         services.AddInfrastructure(connectionString);
 
-        // Construir el service provider
+        // Build the service provider
         ServiceProvider = services.BuildServiceProvider();
         MoneyTracker.Presentation.Binding.AppServices.Initialize(ServiceProvider);
-        // Validar configuración crítica
+        // Validate critical configuration
         ValidateServiceConfiguration();
     }
 
     /// <summary>
-    /// Obtiene la ruta donde guardar la base de datos
+    /// Gets the path where the database will be stored.
     /// </summary>
     private string GetDatabasePath()
     {
         try
         {
-            // En Android, usar el directorio de archivos externos de la app
+            // On Android use the app's external files directory
             var externalFilesDir = GetExternalFilesDir(null);
             if (externalFilesDir != null)
             {
                 return Path.Combine(externalFilesDir.AbsolutePath, "MoneyTracker.db");
             }
 
-            // Fallback: directorio interno
+            // Fallback: use the internal directory
             var internalDir = FilesDir;
             return Path.Combine(internalDir!.AbsolutePath, "MoneyTracker.db");
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error getting database path: {ex.Message}");
-            // Fallback absoluto
+            // Final fallback
             return "/data/data/com.moneytracker.app/files/MoneyTracker.db";
         }
     }
 
     /// <summary>
-    /// Valida que los servicios críticos estén registrados correctamente
+    /// Validates that critical services are registered correctly.
     /// </summary>
     private void ValidateServiceConfiguration()
     {
         try
         {
-            // Verificar servicios críticos
+            // Verify critical services
             _ = ServiceProvider!.GetRequiredService<MoneyTrackerContext>();
             _ = ServiceProvider.GetRequiredService<TransactionAppService>();
             _ = ServiceProvider.GetRequiredService<CategoryAppService>();
@@ -152,7 +150,7 @@ public class MoneyTrackerApplication : Android.App.Application
     }
 
     /// <summary>
-    /// Inicializa la base de datos con migraciones y datos iniciales
+    /// Initializes the database with migrations and seed data.
     /// </summary>
     private async Task InitializeDatabaseAsync()
     {
@@ -162,12 +160,12 @@ public class MoneyTrackerApplication : Android.App.Application
             var context = scope.ServiceProvider.GetRequiredService<MoneyTrackerContext>();
             var categoryService = scope.ServiceProvider.GetRequiredService<CategoryAppService>();
 
-            // Crear base de datos si no existe
+            // Create the database if it does not exist
             await context.Database.EnsureCreatedAsync();
 
             System.Diagnostics.Debug.WriteLine($"📁 Database initialized at: {context.Database.GetDbConnection().ConnectionString}");
 
-            // Inicializar categorías predeterminadas
+            // Initialize default categories
             var categoriesCreated = await categoryService.InitializeDefaultCategoriesAsync();
             if (categoriesCreated > 0)
             {
@@ -177,29 +175,29 @@ public class MoneyTrackerApplication : Android.App.Application
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"❌ Database initialization failed: {ex.Message}");
-            // No hacer throw aquí - la app puede continuar y reintentar más tarde
+            // Do not throw here - the app can continue and retry later
         }
     }
 
     /// <summary>
-    /// Método estático para obtener servicios desde cualquier lugar
+    /// Static helper to resolve services from anywhere.
     /// </summary>
     public static T GetService<T>() where T : class
     {
         if (ServiceProvider == null)
-            throw new InvalidOperationException("ServiceProvider no está inicializado");
+            throw new InvalidOperationException("ServiceProvider has not been initialized");
 
         return ServiceProvider.GetRequiredService<T>();
     }
 
     /// <summary>
-    /// Limpieza cuando la aplicación se cierra
+    /// Performs cleanup when the application shuts down.
     /// </summary>
     public override void OnTerminate()
     {
         try
         {
-            // Cerrar conexiones de base de datos
+            // Close database connections
             using var scope = ServiceProvider?.CreateScope();
             var context = scope?.ServiceProvider.GetService<MoneyTrackerContext>();
             context?.Dispose();
@@ -209,7 +207,7 @@ public class MoneyTrackerApplication : Android.App.Application
                 UnregisterActivityLifecycleCallbacks(_currentActivityProvider);
             }
 
-            // Dispose del ServiceProvider
+            // Dispose the ServiceProvider
             if (ServiceProvider is IDisposable disposable)
                 disposable.Dispose();
         }
