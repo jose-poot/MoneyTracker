@@ -1,15 +1,22 @@
-﻿using Android;
+﻿using Android.App;
+using Android.OS;
 using Android.Views;
+
 using AndroidX.AppCompat.App;
 using Microsoft.Extensions.DependencyInjection;
 using Java.Lang;
 
 using MoneyTracker.Presentation.Fragments;
 
+using MoneyTracker.Presentation.Fragments;
+using MoneyTracker.Presentation.Base;
+using MoneyTracker.Presentation.ViewModels;
+
+
 namespace MoneyTracker.Presentation.Activities
 {
     [Activity(Label = "@string/app_name", MainLauncher = true)]
-    public class MainActivity : AppCompatActivity
+    public class MainActivity : ActivityBase<TransactionListViewModel>
     {
         protected override void OnCreate(Bundle? savedInstanceState)
         {
@@ -51,10 +58,11 @@ namespace MoneyTracker.Presentation.Activities
         {
             if (item?.ItemId == 1001)
             {
-                var nav = MoneyTracker.Presentation.Binding.AppServices.ServiceProvider
-                    .GetRequiredService<MoneyTracker.Presentation.Navigation.INavigator>();
-                nav.GoTo<MoneyTracker.Presentation.Activities.SettingsActivity>(this);
-                return true;
+                if (NavigationService != null)
+                {
+                    _ = NavigationService.NavigateToAsync("Settings");
+                    return true;
+                }
             }
             return base.OnOptionsItemSelected(item);
         }

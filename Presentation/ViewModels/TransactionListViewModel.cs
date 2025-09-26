@@ -30,8 +30,13 @@ public partial class TransactionListViewModel : BaseViewModel
         TransactionAppService transactionService,
         CategoryAppService categoryService,
         IDialogService dialogService,
+
         INavigationService navigationService)
         : base(dialogService, navigationService)
+        INavigationService navigationService,
+        ICacheService? cacheService = null)
+        : base(dialogService, navigationService, cacheService)
+
     {
         _transactionService = transactionService;
         _categoryService = categoryService;
@@ -255,21 +260,35 @@ public partial class TransactionListViewModel : BaseViewModel
     /// Navegar a agregar transacción
     /// </summary>
     [RelayCommand]
-    private void NavigateToAddTransaction()
+    private async Task NavigateToAddTransaction()
     {
+
         _ = NavigationService?.NavigateToAsync("AddTransaction");
+        if (NavigationService == null)
+        {
+            return;
+        }
+
+        await NavigationService.NavigateToAsync("AddTransaction");
     }
 
     /// <summary>
     /// Editar una transacción
     /// </summary>
     [RelayCommand]
-    private void EditTransaction(TransactionDto transaction)
+    private async Task EditTransaction(TransactionDto transaction)
     {
         if (transaction == null) return;
 
         _ = NavigationService?.NavigateToAsync("EditTransaction", transaction);
 
+        if (NavigationService == null)
+        {
+            return;
+        }
+
+
+        await NavigationService.NavigateToAsync("EditTransaction", transaction);
     }
 
     /// <summary>
@@ -295,15 +314,26 @@ public partial class TransactionListViewModel : BaseViewModel
                 HasTransactions = _allTransactions.Any();
                 EmptyMessage = GetEmptyMessage();
 
+
                 DialogService?.ShowToast("Transacción eliminada correctamente");
+                await ShowMessageAsync("Transacción eliminada correctamente");
+
             }
             else
             {
                 // Mostrar errores
                 var errorMessage = string.Join("\n", result.Errors);
+
                 _ = DialogService?.ShowErrorAsync(string.IsNullOrWhiteSpace(errorMessage)
                     ? "Ocurrió un error"
                     : errorMessage);
+
+                if (DialogService != null)
+                {
+                    var message = string.IsNullOrWhiteSpace(errorMessage) ? "Ocurrió un error" : errorMessage;
+                    await DialogService.ShowErrorAsync(message);
+                }
+
             }
         });
     }

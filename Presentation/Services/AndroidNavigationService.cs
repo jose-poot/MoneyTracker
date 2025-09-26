@@ -1,21 +1,26 @@
 ﻿using Android.Content;
+
+using Android.OS;
+using AndroidX.AppCompat.App;
+using AndroidX.Fragment.App;
+
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Presentation.Activities;
 using MoneyTracker.Presentation.Fragments;
+using MoneyTracker.Presentation.Navigation;
 using MoneyTracker.Presentation.Services.Interfaces;
 using MoneyTracker.Presentation.ViewModels;
+using System;
 
 namespace MoneyTracker.Presentation.Services;
 
 public class AndroidNavigationService : INavigationService
 {
     private readonly Func<Activity> _currentActivityProvider;
-    private readonly IServiceProvider _serviceProvider;
 
-    public AndroidNavigationService(Func<Activity> currentActivityProvider, IServiceProvider serviceProvider)
+    public AndroidNavigationService(Func<Activity> currentActivityProvider)
     {
         _currentActivityProvider = currentActivityProvider;
-        _serviceProvider = serviceProvider;
     }
 
     public bool CanNavigateBack
@@ -23,41 +28,50 @@ public class AndroidNavigationService : INavigationService
         get
         {
             var activity = _currentActivityProvider();
-            return activity is AndroidX.AppCompat.App.AppCompatActivity appActivity &&
+            return activity is AppCompatActivity appActivity &&
                    appActivity.SupportFragmentManager.BackStackEntryCount > 0;
         }
     }
 
     public Task NavigateToAsync<TViewModel>() where TViewModel : BaseViewModel
     {
-        return NavigateToAsync<TViewModel>(null);
+        var route = GetRouteFromViewModelType(typeof(TViewModel));
+        return NavigateToAsync(route);
     }
 
     public Task NavigateToAsync<TViewModel>(object parameters) where TViewModel : BaseViewModel
     {
-        var viewModelType = typeof(TViewModel);
-        var route = GetRouteFromViewModelType(viewModelType);
+        var route = GetRouteFromViewModelType(typeof(TViewModel));
         return NavigateToAsync(route, parameters);
     }
 
     public Task NavigateToAsync(string route, object? parameters = null)
     {
-        var activity = _currentActivityProvider();
-
         return route switch
         {
-            "AddTransaction" => NavigateToFragment<AddTransactionFragment>(parameters),
-            "EditTransaction" => NavigateToFragment<AddTransactionFragment>(parameters),
+            "AddTransaction" => NavigateToFragment(new AddTransactionFragment(), parameters, "AddTransaction"),
+            "EditTransaction" => NavigateToEditTransaction(parameters),
             "Settings" => NavigateToActivity<SettingsActivity>(parameters),
             _ => throw new ArgumentException($"Unknown route: {route}")
         };
+    }
+
+    private Task NavigateToEditTransaction(object? parameters)
+    {
+        if (parameters is TransactionDto transaction)
+        {
+            var fragment = AddTransactionFragment.NewInstanceForEdit(transaction);
+            return NavigateToFragment(fragment, null, "EditTransaction");
+        }
+
+        throw new ArgumentException("EditTransaction navigation requires a TransactionDto parameter.", nameof(parameters));
     }
 
     public Task NavigateBackAsync()
     {
         var activity = _currentActivityProvider();
 
-        if (activity is AndroidX.AppCompat.App.AppCompatActivity appActivity)
+        if (activity is AppCompatActivity appActivity)
         {
             if (appActivity.SupportFragmentManager.BackStackEntryCount > 0)
             {
@@ -76,35 +90,51 @@ public class AndroidNavigationService : INavigationService
     {
         var activity = _currentActivityProvider();
 
-        if (activity is AndroidX.AppCompat.App.AppCompatActivity appActivity)
+        if (activity is AppCompatActivity appActivity)
         {
             // Clear back stack
             appActivity.SupportFragmentManager.PopBackStack(null,
-                AndroidX.Fragment.App.FragmentManager.PopBackStackInclusive);
+                FragmentManager.PopBackStackInclusive);
         }
 
         return Task.CompletedTask;
     }
 
-    private Task NavigateToFragment<TFragment>(object? parameters) where TFragment : AndroidX.Fragment.App.Fragment, new()
+    private Task NavigateToFragment<TFragment>(object? parameters, string? backStackTag = null) where TFragment : Fragment, new()
+    {
+        var fragment = new TFragment();
+        var tag = backStackTag ?? typeof(TFragment).Name;
+        return NavigateToFragment(fragment, parameters, tag);
+    }
+
+    private Task NavigateToFragment(Fragment fragment, object? parameters, string? backStackTag)
     {
         var activity = _currentActivityProvider();
 
-        if (activity is AndroidX.AppCompat.App.AppCompatActivity appActivity)
+        if (activity is AppCompatActivity appActivity)
         {
-            var fragment = new TFragment();
-
             if (parameters != null)
             {
                 var args = CreateFragmentArguments(parameters);
-                fragment.Arguments = args;
+                if (fragment.Arguments == null)
+                {
+                    fragment.Arguments = args;
+                }
+                else
+                {
+                    fragment.Arguments.PutAll(args);
+                }
             }
 
-            appActivity.SupportFragmentManager
-                .BeginTransaction()
-                .Replace(Resource.Id.fragment_container, fragment)
-                .AddToBackStack(typeof(TFragment).Name)
-                .Commit();
+            var transaction = appActivity.SupportFragmentManager.BeginTransaction();
+            transaction.Replace(Resource.Id.fragment_container, fragment);
+
+            if (!string.IsNullOrEmpty(backStackTag))
+            {
+                transaction.AddToBackStack(backStackTag);
+            }
+
+            transaction.CommitAllowingStateLoss();
         }
 
         return Task.CompletedTask;
@@ -141,6 +171,7 @@ public class AndroidNavigationService : INavigationService
         var bundle = new Bundle();
         var json = Newtonsoft.Json.JsonConvert.SerializeObject(parameters);
 
+
         if (parameters is TransactionDto)
         {
             bundle.PutString("transaction_json", json);
@@ -149,6 +180,9 @@ public class AndroidNavigationService : INavigationService
         {
             bundle.PutString("parameters", json);
         }
+
+
+        bundle.PutString(NavigationParameterKeys.FragmentParameters, json);
 
         return bundle;
     }
