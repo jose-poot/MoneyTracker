@@ -5,6 +5,7 @@ using MoneyTracker.Application.DTOs;
 using MoneyTracker.Core.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MoneyTracker.Presentation.Adapters
 {
@@ -25,9 +26,9 @@ namespace MoneyTracker.Presentation.Adapters
         /// <summary>
         /// Actualiza la lista de transacciones
         /// </summary>
-        public void UpdateTransactions(List<TransactionDto> transactions)
+        public void UpdateTransactions(IEnumerable<TransactionDto> transactions)
         {
-            _transactions = transactions ?? new List<TransactionDto>();
+            _transactions = transactions?.ToList() ?? new List<TransactionDto>();
             NotifyDataSetChanged();
         }
 

@@ -11,8 +11,10 @@ using Google.Android.Material.FloatingActionButton;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Core.Enums;
 using MoneyTracker.Presentation.Adapters;
+using MoneyTracker.Presentation.Extensions;
 using MoneyTracker.Presentation.ViewModels;
 using System;
+using System.Collections.Specialized;
 using System.Linq;
 using Fragment = AndroidX.Fragment.App.Fragment;
 
@@ -25,6 +27,9 @@ namespace MoneyTracker.Presentation.Fragments
     {
         private TransactionListViewModel? _viewModel;
         private TransactionAdapter? _adapter;
+        private CompositeDisposable? _subscriptions;
+        private LinearLayoutManager? _layoutManager;
+        private EndlessScrollListener? _scrollListener;
 
         // Controles de UI
         private RecyclerView? _recyclerView;
@@ -89,15 +94,38 @@ namespace MoneyTracker.Presentation.Fragments
         {
             if (_recyclerView != null)
             {
-                _recyclerView.SetLayoutManager(new LinearLayoutManager(Context));
+                _layoutManager = new LinearLayoutManager(Context);
+                _recyclerView.SetLayoutManager(_layoutManager);
+                _recyclerView.SetHasFixedSize(true);
 
                 _adapter = new TransactionAdapter();
                 _recyclerView.SetAdapter(_adapter);
+
+                _scrollListener = new EndlessScrollListener(
+                    _layoutManager,
+                    () => _viewModel?.HasMoreTransactions == true,
+                    OnLoadMoreRequested);
+
+                _recyclerView.AddOnScrollListener(_scrollListener);
 
                 // Configurar callbacks del adapter
                 _adapter.ItemClick += OnTransactionClick;
                 _adapter.EditClick += OnTransactionEdit;
                 _adapter.DeleteClick += OnTransactionDelete;
+            }
+        }
+
+        private void OnLoadMoreRequested()
+        {
+            if (_viewModel == null)
+            {
+                _scrollListener?.SetLoading(false);
+                return;
+            }
+
+            if (!_viewModel.TryLoadMoreTransactions())
+            {
+                _scrollListener?.SetLoading(false);
             }
         }
 
@@ -110,26 +138,32 @@ namespace MoneyTracker.Presentation.Fragments
         {
             if (_viewModel == null) return;
 
-            // Observar cambios en las transacciones
-            _viewModel.FilteredTransactions.CollectionChanged += (s, e) =>
+            _subscriptions?.Dispose();
+            _subscriptions = new CompositeDisposable();
+
+            NotifyCollectionChangedEventHandler collectionChangedHandler = (s, e) =>
             {
                 Activity?.RunOnUiThread(() =>
                 {
-                    _adapter?.UpdateTransactions(_viewModel.FilteredTransactions.ToList());
-                    UpdateEmptyState();
+                    UpdateTransactionList();
                 });
             };
 
-            // Observar cambios en propiedades
-            _viewModel.PropertyChanged += (s, e) =>
+            _viewModel.FilteredTransactions.CollectionChanged += collectionChangedHandler;
+            _subscriptions.Add(new ActionDisposable(() =>
+                _viewModel.FilteredTransactions.CollectionChanged -= collectionChangedHandler));
+
+            PropertyChangedEventHandler propertyChangedHandler = (s, e) =>
             {
                 Activity?.RunOnUiThread(() =>
                 {
+                    if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(TransactionListViewModel.FormattedBalance) || e.PropertyName == nameof(TransactionListViewModel.BalanceColor))
+                    {
+                        UpdateBalanceDisplay();
+                    }
+
                     switch (e.PropertyName)
                     {
-                        case nameof(TransactionListViewModel.FormattedBalance):
-                            UpdateBalanceDisplay();
-                            break;
                         case nameof(TransactionListViewModel.FormattedIncome):
                             if (_incomeText != null)
                                 _incomeText.Text = _viewModel.FormattedIncome;
@@ -145,13 +179,19 @@ namespace MoneyTracker.Presentation.Fragments
                         case nameof(TransactionListViewModel.EmptyMessage):
                             UpdateEmptyState();
                             break;
+                        case nameof(TransactionListViewModel.VisibleTransactions):
+                            UpdateTransactionList();
+                            break;
                     }
                 });
             };
 
-            // Configuración inicial
+            _viewModel.PropertyChanged += propertyChangedHandler;
+            _subscriptions.Add(new ActionDisposable(() =>
+                _viewModel.PropertyChanged -= propertyChangedHandler));
+
             UpdateBalanceDisplay();
-            UpdateEmptyState();
+            UpdateTransactionList();
         }
 
         /// <summary>
@@ -169,14 +209,28 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
+        /// Actualiza el listado visible en el RecyclerView.
+        /// </summary>
+        private void UpdateTransactionList()
+        {
+            if (_viewModel == null) return;
+
+            var transactions = _viewModel.VisibleTransactions;
+            _adapter?.UpdateTransactions(transactions);
+            _scrollListener?.ResetState();
+            UpdateEmptyState(transactions.Count);
+        }
+
+        /// <summary>
         /// Actualiza el estado vacío de la lista
         /// </summary>
-        private void UpdateEmptyState()
+        private void UpdateEmptyState(int? visibleCount = null)
         {
             if (_viewModel == null || _emptyStateLayout == null || _recyclerView == null)
                 return;
 
-            var isEmpty = !_viewModel.FilteredTransactions.Any();
+            var count = visibleCount ?? _viewModel.VisibleTransactions.Count;
+            var isEmpty = count == 0;
 
             _emptyStateLayout.Visibility = isEmpty ? ViewStates.Visible : ViewStates.Gone;
             _recyclerView.Visibility = isEmpty ? ViewStates.Gone : ViewStates.Visible;
@@ -305,7 +359,55 @@ namespace MoneyTracker.Presentation.Fragments
                 _adapter.DeleteClick -= OnTransactionDelete;
             }
 
+            if (_recyclerView != null && _scrollListener != null)
+            {
+                _recyclerView.RemoveOnScrollListener(_scrollListener);
+            }
+
+            _subscriptions?.Dispose();
+            _subscriptions = null;
+            _scrollListener = null;
+            _layoutManager = null;
+
             base.OnDestroyView();
+        }
+
+        private sealed class EndlessScrollListener : RecyclerView.OnScrollListener
+        {
+            private readonly LinearLayoutManager _layoutManager;
+            private readonly Func<bool> _hasMore;
+            private readonly Action _loadMore;
+            private bool _isLoading;
+
+            public EndlessScrollListener(LinearLayoutManager layoutManager, Func<bool> hasMore, Action loadMore)
+            {
+                _layoutManager = layoutManager;
+                _hasMore = hasMore;
+                _loadMore = loadMore;
+            }
+
+            public override void OnScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                base.OnScrolled(recyclerView, dx, dy);
+
+                if (dy <= 0 || _isLoading || !_hasMore())
+                    return;
+
+                var totalItemCount = _layoutManager.ItemCount;
+                if (totalItemCount == 0)
+                    return;
+
+                var lastVisibleItem = _layoutManager.FindLastVisibleItemPosition();
+                if (lastVisibleItem >= totalItemCount - 4)
+                {
+                    _isLoading = true;
+                    _loadMore();
+                }
+            }
+
+            public void SetLoading(bool isLoading) => _isLoading = isLoading;
+
+            public void ResetState() => _isLoading = false;
         }
     }
 }
