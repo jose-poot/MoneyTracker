@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Application.Services;
-using MoneyTracker.Presentation.Messages;
+using MoneyTracker.Presentation.Services.Interfaces;
+using System.Threading.Tasks;
 
 namespace MoneyTracker.Presentation.ViewModels;
 
@@ -12,7 +12,6 @@ namespace MoneyTracker.Presentation.ViewModels;
 /// Sigue el mismo patrón que TransactionListViewModel:
 /// - [ObservableProperty] en campos privados con _
 /// - [RelayCommand] para comandos generados
-/// - Mensajería con WeakReferenceMessenger
 /// </summary>
 public partial class SettingsViewModel : BaseViewModel
 {
@@ -36,7 +35,11 @@ public partial class SettingsViewModel : BaseViewModel
 
     private int _userId;
 
-    public SettingsViewModel(UserAppService users)
+    public SettingsViewModel(
+        UserAppService users,
+        IDialogService dialogService,
+        INavigationService navigationService)
+        : base(dialogService, navigationService)
     {
         _users = users;
         Title = "Settings";
@@ -77,7 +80,10 @@ public partial class SettingsViewModel : BaseViewModel
             var name = (UserName ?? string.Empty).Trim();
             if (name.Length == 0)
             {
-                WeakReferenceMessenger.Default.Send(new ShowErrorMessage("Por favor ingresa un nombre de usuario."));
+                if (DialogService != null)
+                {
+                    await DialogService.ShowErrorAsync("Por favor ingresa un nombre de usuario.");
+                }
                 return;
             }
 
@@ -94,11 +100,14 @@ public partial class SettingsViewModel : BaseViewModel
             var (success, error) = await _users.UpdateSettingsAsync(dto);
             if (!success)
             {
-                WeakReferenceMessenger.Default.Send(new ShowErrorMessage(error ?? "No se pudo guardar."));
+                if (DialogService != null)
+                {
+                    await DialogService.ShowErrorAsync(error ?? "No se pudo guardar.");
+                }
                 return;
             }
 
-            WeakReferenceMessenger.Default.Send(new ShowMessageMessage("Settings guardados."));
+            DialogService?.ShowToast("Settings guardados.");
         });
     }
 
