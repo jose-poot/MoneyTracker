@@ -73,6 +73,7 @@ public class MoneyTrackerApplication : Android.App.Application
         // Configurar ruta de base de datos
         var dbPath = GetDatabasePath();
         var connectionString = $"Data Source={dbPath}";
+ 
         if (_currentActivityProvider == null)
         {
             throw new InvalidOperationException("El proveedor de actividad actual no ha sido inicializado.");
@@ -80,6 +81,23 @@ public class MoneyTrackerApplication : Android.App.Application
 
         Func<Activity> activityProviderFunc = () => _currentActivityProvider.GetCurrentActivity();
         Func<Context> contextProviderFunc = () => activityProviderFunc();
+
+
+        services.AddSingleton<Func<Activity>>(_ => () =>
+        {
+            var activity = CurrentActivityHolder.Current;
+            return activity ?? throw new InvalidOperationException("No hay una actividad actual registrada para navegación.");
+        });
+
+        services.AddSingleton<Func<Context>>(_ => () =>
+        {
+            return CurrentActivityHolder.Current ?? ApplicationContext!;
+        });
+
+        services.AddSingleton<IDialogService, AndroidDialogService>();
+        services.AddSingleton<INavigationService, AndroidNavigationService>();
+        services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext!));
+             
 
         // Servicios
         services.AddSingleton<Func<Activity>>(activityProviderFunc);
