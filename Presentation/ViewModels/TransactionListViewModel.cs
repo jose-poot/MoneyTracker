@@ -233,7 +233,7 @@ public partial class TransactionListViewModel : BaseViewModel
     /// <summary>
     /// Refresh manual
     /// </summary>
-    public override async Task RefreshAsync()
+    protected override async Task RefreshAsync()
     {
         IsRefreshing = true;
         try

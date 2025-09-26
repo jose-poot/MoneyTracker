@@ -8,7 +8,7 @@ using Java.Lang;
 using CommunityToolkit.Mvvm.Messaging;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Presentation.Fragments;
-using MoneyTracker.Presentation.Messages;   // <-- tus mensajes tipados
+using MoneyTracker.Presentation.Messages;   
 using MoneyTracker.Presentation.ViewModels;
 
 namespace MoneyTracker.Presentation.Activities

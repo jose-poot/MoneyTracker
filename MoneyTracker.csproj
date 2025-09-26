@@ -18,6 +18,7 @@
 		<Folder Include="Application\Common\" />
 		<Folder Include="Application\Extensions\" />
 		<Folder Include="Core\Enums\" />
+		<Folder Include="Presentation\Base\Enums\" />
 	</ItemGroup>
 
 	<ItemGroup>

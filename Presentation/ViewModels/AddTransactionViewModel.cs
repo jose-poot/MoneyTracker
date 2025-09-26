@@ -5,6 +5,7 @@ using MoneyTracker.Application.DTOs;
 using MoneyTracker.Application.Services;
 using MoneyTracker.Core.Enums;
 using MoneyTracker.Presentation.Messages;
+using MoneyTracker.Presentation.Services.Interfaces;
 using System.Collections.ObjectModel;
 
 namespace MoneyTracker.Presentation.ViewModels;
@@ -16,78 +17,49 @@ public partial class AddTransactionViewModel : BaseViewModel
 {
     private readonly TransactionAppService _transactionService;
     private readonly CategoryAppService _categoryService;
+    private readonly IDialogService _dialogService;
+    private readonly INavigationService _navigationService;
 
     public AddTransactionViewModel(
         TransactionAppService transactionService,
-        CategoryAppService categoryService)
+        CategoryAppService categoryService,
+        IDialogService dialogService,
+        INavigationService navigationService)
     {
         _transactionService = transactionService;
         _categoryService = categoryService;
+        _dialogService = dialogService;
+        _navigationService = navigationService;
 
         Title = "Nueva Transacción";
-
-        // Inicializar colecciones
         Categories = new ObservableCollection<CategoryDto>();
         ValidationErrors = new ObservableCollection<string>();
 
-        // Valores por defecto
         TransactionDate = DateTime.Now;
         TransactionType = TransactionType.Expense;
         Currency = "USD";
 
-        // Cargar categorías
         _ = LoadCategoriesAsync();
     }
 
-    #region Propiedades del Formulario
+   
 
-    [ObservableProperty]
-    private string _description = string.Empty;
+    [ObservableProperty] private string _description = string.Empty;
+    [ObservableProperty] private decimal _amount;
+    [ObservableProperty] private string _currency = "USD";
+    [ObservableProperty] private TransactionType _transactionType = TransactionType.Expense;
+    [ObservableProperty] private DateTime _transactionDate = DateTime.Now;
+    [ObservableProperty] private CategoryDto? _selectedCategory;
+    [ObservableProperty] private string _notes = string.Empty;
+    [ObservableProperty] private string _location = string.Empty;
+    [ObservableProperty] private bool _isRecurring;
+    [ObservableProperty] private bool _isEditMode;
+    [ObservableProperty] private int _transactionId;
+    [ObservableProperty] private bool _hasValidationErrors;
+    [ObservableProperty] private bool _canSave;
 
-    [ObservableProperty]
-    private decimal _amount;
-
-    [ObservableProperty]
-    private string _currency = "USD";
-
-    [ObservableProperty]
-    private TransactionType _transactionType = TransactionType.Expense;
-
-    [ObservableProperty]
-    private DateTime _transactionDate = DateTime.Now;
-
-    [ObservableProperty]
-    private CategoryDto? _selectedCategory;
-
-    [ObservableProperty]
-    private string _notes = string.Empty;
-
-    [ObservableProperty]
-    private string _location = string.Empty;
-
-    [ObservableProperty]
-    private bool _isRecurring;
-
-    #endregion
-
-    #region Colecciones y Estado
-
-    public ObservableCollection<CategoryDto> Categories { get; }
-    public ObservableCollection<string> ValidationErrors { get; }
-
-    [ObservableProperty]
-    private bool _isEditMode;
-
-    [ObservableProperty]
-    private int _transactionId;
-
-    [ObservableProperty]
-    private bool _hasValidationErrors;
-
-    [ObservableProperty]
-    private bool _canSave;
-
-    #endregion
+    public new ObservableCollection<CategoryDto> Categories { get; }
+    public new ObservableCollection<string> ValidationErrors { get; }
 
     #region Propiedades Calculadas
 
@@ -180,10 +152,11 @@ public partial class AddTransactionViewModel : BaseViewModel
     /// Cancela la operación
     /// </summary>
     [RelayCommand]
-    private void Cancel()
+    private async Task CancelAsync()
     {
-        WeakReferenceMessenger.Default.Send(new NavigateBackMessage());
+        await _navigationService.NavigateBackAsync();
     }
+
 
     /// <summary>
     /// Limpia el formulario
@@ -257,12 +230,12 @@ public partial class AddTransactionViewModel : BaseViewModel
 
         if (success && transaction != null)
         {
-            WeakReferenceMessenger.Default.Send(new TransactionSavedMessage(transaction));
-            WeakReferenceMessenger.Default.Send(new ShowMessageMessage("Transacción creada correctamente"));
-            WeakReferenceMessenger.Default.Send(new NavigateBackMessage());
+            _dialogService.ShowToast("Transacción creada correctamente");
+            await _navigationService.NavigateBackAsync();
         }
         else
         {
+            await _dialogService.ShowErrorAsync("Error al crear la transacción");
             ShowValidationErrors(errors);
         }
     }
@@ -335,7 +308,7 @@ public partial class AddTransactionViewModel : BaseViewModel
         return CanSave;
     }
 
-    private void AddValidationError(string error)
+    protected new void AddValidationError(string error)
     {
         if (!ValidationErrors.Contains(error))
         {
@@ -343,8 +316,7 @@ public partial class AddTransactionViewModel : BaseViewModel
             HasValidationErrors = true;
         }
     }
-
-    private void ClearValidationErrors()
+    private new void ClearValidationErrors()
     {
         ValidationErrors.Clear();
         HasValidationErrors = false;
