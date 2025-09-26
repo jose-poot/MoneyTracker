@@ -1,11 +1,10 @@
 using Android.App;
 using Android.OS;
 using System;
-using Application = Android.App.Application;
 
 namespace MoneyTracker.Presentation.Services;
 
-public class CurrentActivityProvider : Java.Lang.Object, Application.IActivityLifecycleCallbacks
+public class CurrentActivityProvider : Java.Lang.Object, Android.App.Application.IActivityLifecycleCallbacks
 {
     private readonly object _syncRoot = new();
     private Activity? _currentActivity;

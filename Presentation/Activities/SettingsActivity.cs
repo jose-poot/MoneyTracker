@@ -1,32 +1,34 @@
-﻿using Android;
 using Android.App;
 using Android.OS;
 using Android.Widget;
 using MoneyTracker.Presentation.Base;
-using MoneyTracker.Presentation.Binding;
 using MoneyTracker.Presentation.ViewModels;
+using System;
 
 namespace MoneyTracker.Presentation.Activities
 {
     [Activity(Label = "Settings")]
     public sealed class SettingsActivity : ActivityBase<SettingsViewModel>
     {
-        protected override async void OnCreate(Bundle? savedInstanceState)
+        protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_settings);
 
-        //    var txtUser = FindViewById<EditText>(Resource.Id.txtUserName)!;
-        //    var btnSave = FindViewById<Button>(Resource.Id.btnSave)!;
+            var txtUser = FindViewById<EditText>(Resource.Id.txtUserName)
+                ?? throw new InvalidOperationException("The user name field was not found in the layout.");
+            var btnSave = FindViewById<Button>(Resource.Id.btnSave)
+                ?? throw new InvalidOperationException("The save button was not found in the layout.");
 
-        //    // ✅ Use the generated command instead of calling the method directly
-        //    await ViewModel.LoadAsyncCommand.ExecuteAsync(null);
+            var set = CreateDataBindingSet();
 
-        //    var set = new BindingSet<SettingsViewModel>(ViewModel);
-        //    set.BindText(txtUser, vm => vm.UserName, (vm, v) => vm.UserName = v ?? string.Empty);
+            set.Bind(txtUser).To<string>(vm => ((SettingsViewModel)vm).UserName).TwoWay();
+            set.Bind(btnSave).To(vm => ((SettingsViewModel)vm).SaveAsyncCommand);
 
-        //    // ✅ Use the auto-generated command
-        //    set.BindClick(btnSave, ViewModel.SaveAsyncCommand);
+            set.Apply();
+            ApplyDataBindings();
+
+            _ = ViewModel.LoadAsyncCommand.ExecuteAsync(null);
         }
     }
 }
