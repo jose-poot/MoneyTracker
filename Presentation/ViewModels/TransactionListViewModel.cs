@@ -4,8 +4,11 @@ using CommunityToolkit.Mvvm.Messaging;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Application.Services;
 using MoneyTracker.Core.Enums;
+using MoneyTracker.Presentation.Collections;
 using MoneyTracker.Presentation.Messages;
-using System.Collections.ObjectModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MoneyTracker.Presentation.ViewModels;
 
@@ -15,15 +18,15 @@ namespace MoneyTracker.Presentation.ViewModels;
 public partial class TransactionListViewModel : BaseViewModel
 {
     private readonly TransactionAppService _transactionService;
+    private readonly List<TransactionDto> _allTransactions = new();
 
     public TransactionListViewModel(TransactionAppService transactionService)
     {
         _transactionService = transactionService;
         Title = "Mis Transacciones";
 
-        // Inicializar colecciones
-        Transactions = new ObservableCollection<TransactionDto>();
-        FilteredTransactions = new ObservableCollection<TransactionDto>();
+        FilteredTransactions = new VirtualizedObservableCollection<TransactionDto>(pageSize: 25);
+        FilteredTransactions.SetSortComparer((x, y) => DateTime.Compare(y.Date, x.Date));
 
         // Cargar datos iniciales
         _ = LoadDataAsync();
@@ -32,14 +35,19 @@ public partial class TransactionListViewModel : BaseViewModel
     #region Propiedades Observables
 
     /// <summary>
-    /// Todas las transacciones
-    /// </summary>
-    public ObservableCollection<TransactionDto> Transactions { get; }
-
-    /// <summary>
     /// Transacciones filtradas para mostrar
     /// </summary>
-    public ObservableCollection<TransactionDto> FilteredTransactions { get; }
+    public VirtualizedObservableCollection<TransactionDto> FilteredTransactions { get; }
+
+    /// <summary>
+    /// Transacciones visibles en la página actual
+    /// </summary>
+    public IReadOnlyList<TransactionDto> VisibleTransactions => FilteredTransactions.VisibleItems;
+
+    /// <summary>
+    /// Indica si hay más elementos para paginar
+    /// </summary>
+    public bool HasMoreTransactions => FilteredTransactions.HasMorePages;
 
     /// <summary>
     /// Filtro de texto para buscar
@@ -123,27 +131,24 @@ public partial class TransactionListViewModel : BaseViewModel
         {
             var transactions = await _transactionService.GetAllTransactionsAsync();
 
-            // Actualizar colección principal
-            Transactions.Clear();
-            foreach (var transaction in transactions)
+            _allTransactions.Clear();
+            if (transactions != null)
             {
-                Transactions.Add(transaction);
+                _allTransactions.AddRange(transactions);
             }
 
-            // Aplicar filtros
             ApplyFilters();
-
-            // Calcular totales
             CalculateTotals();
 
-            // Actualizar estado
-            HasTransactions = Transactions.Any();
+            HasTransactions = _allTransactions.Any();
+            EmptyMessage = GetEmptyMessage();
 
-            // Notificar cambios en propiedades calculadas
             OnPropertyChanged(nameof(FormattedBalance));
             OnPropertyChanged(nameof(BalanceColor));
             OnPropertyChanged(nameof(FormattedIncome));
             OnPropertyChanged(nameof(FormattedExpenses));
+            OnPropertyChanged(nameof(VisibleTransactions));
+            OnPropertyChanged(nameof(HasMoreTransactions));
         });
     }
 
@@ -213,12 +218,15 @@ public partial class TransactionListViewModel : BaseViewModel
 
             if (result.Success)
             {
-                // Remover de la colección local
-                Transactions.Remove(transaction);
-                ApplyFilters();
-                CalculateTotals();
+                if (_allTransactions.Remove(transaction))
+                {
+                    ApplyFilters();
+                    CalculateTotals();
+                }
 
-                // Mostrar mensaje de éxito
+                HasTransactions = _allTransactions.Any();
+                EmptyMessage = GetEmptyMessage();
+
                 WeakReferenceMessenger.Default.Send(new ShowMessageMessage("Transacción eliminada correctamente"));
             }
             else
@@ -228,6 +236,21 @@ public partial class TransactionListViewModel : BaseViewModel
                 WeakReferenceMessenger.Default.Send(new ShowErrorMessage("Ocurrió un error"));
             }
         });
+    }
+
+    /// <summary>
+    /// Intenta cargar la siguiente página de resultados.
+    /// </summary>
+    public bool TryLoadMoreTransactions()
+    {
+        var loaded = FilteredTransactions.LoadNextPage();
+        if (loaded)
+        {
+            OnPropertyChanged(nameof(VisibleTransactions));
+            OnPropertyChanged(nameof(HasMoreTransactions));
+        }
+
+        return loaded;
     }
 
     /// <summary>
@@ -255,9 +278,8 @@ public partial class TransactionListViewModel : BaseViewModel
     /// </summary>
     private void ApplyFilters()
     {
-        var filtered = Transactions.AsEnumerable();
+        IEnumerable<TransactionDto> filtered = _allTransactions;
 
-        // Filtro por texto
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
             var search = SearchText.ToLowerInvariant();
@@ -267,21 +289,24 @@ public partial class TransactionListViewModel : BaseViewModel
                 t.Notes?.ToLowerInvariant().Contains(search) == true);
         }
 
-        // Filtro por tipo
         if (SelectedType.HasValue)
         {
             filtered = filtered.Where(t => t.Type == SelectedType.Value);
         }
 
-        // Actualizar colección filtrada
-        FilteredTransactions.Clear();
-        foreach (var transaction in filtered.OrderByDescending(t => t.Date))
+        var previousPage = FilteredTransactions.CurrentPage;
+        FilteredTransactions.ReplaceAll(filtered);
+
+        var maxPageIndex = Math.Max(0, (int)Math.Ceiling(FilteredTransactions.TotalCount / (double)FilteredTransactions.PageSize) - 1);
+        var targetPage = Math.Min(previousPage, maxPageIndex);
+        if (targetPage > 0)
         {
-            FilteredTransactions.Add(transaction);
+            FilteredTransactions.GoToPage(targetPage);
         }
 
-        // Actualizar mensaje vacío
         EmptyMessage = GetEmptyMessage();
+        OnPropertyChanged(nameof(VisibleTransactions));
+        OnPropertyChanged(nameof(HasMoreTransactions));
     }
 
     /// <summary>
@@ -289,11 +314,11 @@ public partial class TransactionListViewModel : BaseViewModel
     /// </summary>
     private void CalculateTotals()
     {
-        TotalIncome = Transactions
+        TotalIncome = _allTransactions
             .Where(t => t.Type == TransactionType.Income)
             .Sum(t => t.Amount);
 
-        TotalExpenses = Transactions
+        TotalExpenses = _allTransactions
             .Where(t => t.Type == TransactionType.Expense)
             .Sum(t => t.Amount);
 

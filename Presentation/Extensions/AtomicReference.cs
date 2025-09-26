@@ -1,36 +1,37 @@
-﻿
-    public class AtomicReference<T> where T : class
+﻿namespace MoneyTracker.Presentation.Extensions;
+
+public class AtomicReference<T> where T : class
+{
+    private volatile T? _value;
+    private readonly object _lock = new();
+
+    public AtomicReference() { }
+
+    public AtomicReference(T? initialValue)
     {
-        private volatile T? _value;
-        private readonly object _lock = new();
+        _value = initialValue;
+    }
 
-        public AtomicReference() { }
-
-        public AtomicReference(T? initialValue)
+    public T? GetAndSet(T? newValue)
+    {
+        lock (_lock)
         {
-            _value = initialValue;
-        }
-
-        public T? GetAndSet(T? newValue)
-        {
-            lock (_lock)
-            {
-                var old = _value;
-                _value = newValue;
-                return old;
-            }
-        }
-
-        public void Set(T? newValue)
-        {
-            lock (_lock)
-            {
-                _value = newValue;
-            }
-        }
-
-        public T? Get()
-        {
-            return _value;
+            var old = _value;
+            _value = newValue;
+            return old;
         }
     }
+
+    public void Set(T? newValue)
+    {
+        lock (_lock)
+        {
+            _value = newValue;
+        }
+    }
+
+    public T? Get()
+    {
+        return _value;
+    }
+}

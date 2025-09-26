@@ -1,10 +1,11 @@
 ﻿using Android.OS;
+using Android.Widget;
 using CommunityToolkit.Mvvm.ComponentModel;
-using MoneyTracker.Presentation.Extensions;
+using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using MoneyTracker.Presentation.ViewModels;
 
+namespace MoneyTracker.Presentation.Extensions;
 
 public static partial class ThreadSafeBindingExtensions
 {
