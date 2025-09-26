@@ -1,5 +1,4 @@
-﻿using Android.Runtime;
-using Java.Security;
+using Android.Runtime;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

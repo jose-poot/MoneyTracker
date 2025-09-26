@@ -35,41 +35,126 @@
 
 	</LinearLayout>
 
-	<!-- Búsqueda -->
-	<EditText
-        android:id="@+id/edit_search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:hint="Buscar transacciones..." />
+    <!-- Búsqueda -->
+    <EditText
+    android:id="@+id/edit_search"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:hint="Buscar transacciones..." />
 
-	<!-- Filtros -->
-	<LinearLayout
-        android:id="@+id/chip_group_filters"
-        android:layout_width="match_parent"
+    <!-- Selección de categoría y transacciones recurrentes -->
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
+        <Spinner
+        android:id="@+id/spinner_category"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:prompt="@string/transaction_filter_category_prompt" />
+
+        <CheckBox
+        android:id="@+id/checkbox_recurring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/transaction_filter_recurring"
+        android:paddingStart="8dp" />
+
+    </LinearLayout>
+
+    <!-- Filtros por tipo -->
+    <LinearLayout
+    android:id="@+id/chip_group_filters"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+        <Button
+        android:id="@+id/chip_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/transaction_filter_all" />
+
+        <Button
+        android:id="@+id/chip_income"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/transaction_filter_income" />
+
+        <Button
+        android:id="@+id/chip_expense"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/transaction_filter_expense" />
+
+    </LinearLayout>
+
+    <!-- Rango de fechas -->
+    <HorizontalScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="4dp"
+    android:scrollbars="none">
+
+        <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:gravity="center_vertical">
 
-		<Button
-            android:id="@+id/chip_all"
+            <TextView
+            android:id="@+id/text_date_range"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Todas" />
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/transaction_filter_all_dates"
+            android:textStyle="bold" />
 
-		<Button
-            android:id="@+id/chip_income"
+            <Button
+            android:id="@+id/button_date_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ingresos" />
+            android:text="@string/transaction_filter_all_dates_short" />
 
-		<Button
-            android:id="@+id/chip_expense"
+            <Button
+            android:id="@+id/button_date_current_month"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gastos" />
+            android:layout_marginStart="8dp"
+            android:text="@string/transaction_filter_current_month" />
 
-	</LinearLayout>
+            <Button
+            android:id="@+id/button_date_last_30"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/transaction_filter_last_30" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <!-- Insights -->
+    <TextView
+    android:id="@+id/text_insights"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:text="@string/transaction_insights_placeholder"
+    android:textColor="#616161"
+    android:textSize="14sp" />
 
 	<!-- SwipeRefresh con RecyclerView -->
 	<androidx.swiperefreshlayout.widget.SwipeRefreshLayout

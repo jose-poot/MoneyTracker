@@ -98,8 +98,6 @@ public static class ServiceCollectionExtensions
         // Registrar validadores específicos
         services.AddScoped<CreateTransactionValidator>();
         services.AddScoped<CategoryValidator>();
-        services.AddScoped<TransactionAppService>();
-        services.AddScoped<CategoryAppService>();
 
         // ✅ AGREGAR ESTOS VIEWMODELS:
         services.AddScoped<TransactionListViewModel>();

@@ -9,6 +9,7 @@ using MoneyTracker.Presentation.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MoneyTracker.Presentation.ViewModels;
 
@@ -18,11 +19,18 @@ namespace MoneyTracker.Presentation.ViewModels;
 public partial class TransactionListViewModel : BaseViewModel
 {
     private readonly TransactionAppService _transactionService;
+    private readonly CategoryAppService _categoryService;
     private readonly List<TransactionDto> _allTransactions = new();
+    private readonly List<TransactionDto> _currentFilteredTransactions = new();
+    private readonly List<CategoryDto> _categories = new();
+    private DateTime? _currentRangeStart;
+    private DateTime? _currentRangeEnd;
+    private bool _suspendFilterUpdates;
 
-    public TransactionListViewModel(TransactionAppService transactionService)
+    public TransactionListViewModel(TransactionAppService transactionService, CategoryAppService categoryService)
     {
         _transactionService = transactionService;
+        _categoryService = categoryService;
         Title = "Mis Transacciones";
 
         FilteredTransactions = new VirtualizedObservableCollection<TransactionDto>(pageSize: 25);
@@ -30,6 +38,16 @@ public partial class TransactionListViewModel : BaseViewModel
 
         // Cargar datos iniciales
         _ = LoadDataAsync();
+    }
+
+    /// <summary>
+    /// Opciones de filtro de fechas disponibles.
+    /// </summary>
+    public enum DateFilterOption
+    {
+        AllTime,
+        CurrentMonth,
+        Last30Days
     }
 
     #region Propiedades Observables
@@ -91,6 +109,36 @@ public partial class TransactionListViewModel : BaseViewModel
     [ObservableProperty]
     private string _emptyMessage = "No hay transacciones aún.\n¡Agrega tu primera transacción!";
 
+    /// <summary>
+    /// Categoría seleccionada para filtrar.
+    /// </summary>
+    [ObservableProperty]
+    private CategoryDto? _selectedCategory;
+
+    /// <summary>
+    /// Controla si se muestran solo transacciones recurrentes.
+    /// </summary>
+    [ObservableProperty]
+    private bool _showOnlyRecurring;
+
+    /// <summary>
+    /// Filtro de fechas seleccionado.
+    /// </summary>
+    [ObservableProperty]
+    private DateFilterOption _selectedDateFilter = DateFilterOption.CurrentMonth;
+
+    /// <summary>
+    /// Descripción legible del rango de fechas aplicado.
+    /// </summary>
+    [ObservableProperty]
+    private string _dateRangeDescription = string.Empty;
+
+    /// <summary>
+    /// Texto con recomendaciones o estadísticas rápidas.
+    /// </summary>
+    [ObservableProperty]
+    private string _spendingInsights = string.Empty;
+
     #endregion
 
     #region Propiedades Calculadas
@@ -117,6 +165,11 @@ public partial class TransactionListViewModel : BaseViewModel
     /// </summary>
     public string FormattedExpenses => $"${TotalExpenses:N2}";
 
+    /// <summary>
+    /// Categorías disponibles para filtros.
+    /// </summary>
+    public IReadOnlyList<CategoryDto> Categories => _categories;
+
     #endregion
 
     #region Comandos
@@ -129,7 +182,9 @@ public partial class TransactionListViewModel : BaseViewModel
     {
         await ExecuteSafeAsync(async () =>
         {
+            var loadCategoriesTask = LoadCategoriesAsync();
             var transactions = await _transactionService.GetAllTransactionsAsync();
+            await loadCategoriesTask;
 
             _allTransactions.Clear();
             if (transactions != null)
@@ -138,17 +193,6 @@ public partial class TransactionListViewModel : BaseViewModel
             }
 
             ApplyFilters();
-            CalculateTotals();
-
-            HasTransactions = _allTransactions.Any();
-            EmptyMessage = GetEmptyMessage();
-
-            OnPropertyChanged(nameof(FormattedBalance));
-            OnPropertyChanged(nameof(BalanceColor));
-            OnPropertyChanged(nameof(FormattedIncome));
-            OnPropertyChanged(nameof(FormattedExpenses));
-            OnPropertyChanged(nameof(VisibleTransactions));
-            OnPropertyChanged(nameof(HasMoreTransactions));
         });
     }
 
@@ -172,13 +216,34 @@ public partial class TransactionListViewModel : BaseViewModel
     }
 
     /// <summary>
+    /// Cambia el filtro de fechas activo.
+    /// </summary>
+    [RelayCommand]
+    private void SetDateFilter(DateFilterOption option)
+    {
+        SelectedDateFilter = option;
+    }
+
+    /// <summary>
     /// Limpiar todos los filtros
     /// </summary>
     [RelayCommand]
     private void ClearFilters()
     {
-        SearchText = string.Empty;
-        SelectedType = null;
+        _suspendFilterUpdates = true;
+        try
+        {
+            SearchText = string.Empty;
+            SelectedType = null;
+            SelectedCategory = null;
+            ShowOnlyRecurring = false;
+            SelectedDateFilter = DateFilterOption.AllTime;
+        }
+        finally
+        {
+            _suspendFilterUpdates = false;
+        }
+
         ApplyFilters();
     }
 
@@ -294,8 +359,36 @@ public partial class TransactionListViewModel : BaseViewModel
             filtered = filtered.Where(t => t.Type == SelectedType.Value);
         }
 
+        if (SelectedCategory != null)
+        {
+            filtered = filtered.Where(t => t.CategoryId == SelectedCategory.Id);
+        }
+
+        if (ShowOnlyRecurring)
+        {
+            filtered = filtered.Where(t => t.IsRecurring);
+        }
+
+        var (startDate, endDate) = GetDateRange();
+        _currentRangeStart = startDate;
+        _currentRangeEnd = endDate;
+
+        if (startDate.HasValue)
+        {
+            filtered = filtered.Where(t => t.Date.Date >= startDate.Value.Date);
+        }
+
+        if (endDate.HasValue)
+        {
+            filtered = filtered.Where(t => t.Date.Date <= endDate.Value.Date);
+        }
+
+        var filteredList = filtered.ToList();
+        _currentFilteredTransactions.Clear();
+        _currentFilteredTransactions.AddRange(filteredList);
+
         var previousPage = FilteredTransactions.CurrentPage;
-        FilteredTransactions.ReplaceAll(filtered);
+        FilteredTransactions.ReplaceAll(filteredList);
 
         var maxPageIndex = Math.Max(0, (int)Math.Ceiling(FilteredTransactions.TotalCount / (double)FilteredTransactions.PageSize) - 1);
         var targetPage = Math.Min(previousPage, maxPageIndex);
@@ -304,7 +397,15 @@ public partial class TransactionListViewModel : BaseViewModel
             FilteredTransactions.GoToPage(targetPage);
         }
 
+        CalculateTotals();
         EmptyMessage = GetEmptyMessage();
+        HasTransactions = _allTransactions.Any();
+        UpdateDateRangeDescription();
+        UpdateInsights();
+        OnPropertyChanged(nameof(FormattedBalance));
+        OnPropertyChanged(nameof(BalanceColor));
+        OnPropertyChanged(nameof(FormattedIncome));
+        OnPropertyChanged(nameof(FormattedExpenses));
         OnPropertyChanged(nameof(VisibleTransactions));
         OnPropertyChanged(nameof(HasMoreTransactions));
     }
@@ -314,11 +415,11 @@ public partial class TransactionListViewModel : BaseViewModel
     /// </summary>
     private void CalculateTotals()
     {
-        TotalIncome = _allTransactions
+        TotalIncome = _currentFilteredTransactions
             .Where(t => t.Type == TransactionType.Income)
             .Sum(t => t.Amount);
 
-        TotalExpenses = _allTransactions
+        TotalExpenses = _currentFilteredTransactions
             .Where(t => t.Type == TransactionType.Expense)
             .Sum(t => t.Amount);
 
@@ -330,17 +431,123 @@ public partial class TransactionListViewModel : BaseViewModel
     /// </summary>
     private string GetEmptyMessage()
     {
-        if (!HasTransactions)
+        if (!_allTransactions.Any())
         {
             return "No hay transacciones aún.\n¡Agrega tu primera transacción!";
         }
 
-        if (!string.IsNullOrWhiteSpace(SearchText) || SelectedType.HasValue)
+        if (!_currentFilteredTransactions.Any())
         {
             return "No se encontraron transacciones\ncon los filtros aplicados.";
         }
 
         return "No hay transacciones para mostrar.";
+    }
+
+    /// <summary>
+    /// Obtiene el rango de fechas activo dependiendo de la opción seleccionada.
+    /// </summary>
+    private (DateTime? Start, DateTime? End) GetDateRange()
+    {
+        var today = DateTime.Today;
+        return SelectedDateFilter switch
+        {
+            DateFilterOption.CurrentMonth =>
+                (new DateTime(today.Year, today.Month, 1),
+                 new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month))),
+            DateFilterOption.Last30Days =>
+                (today.AddDays(-29), today),
+            _ => (null, null)
+        };
+    }
+
+    /// <summary>
+    /// Actualiza la descripción del rango de fechas activo para mostrar en UI.
+    /// </summary>
+    private void UpdateDateRangeDescription()
+    {
+        var (start, end) = (_currentRangeStart, _currentRangeEnd);
+
+        if (!start.HasValue && !end.HasValue)
+        {
+            DateRangeDescription = "Mostrando: Todas las fechas";
+            return;
+        }
+
+        if (start.HasValue && end.HasValue)
+        {
+            DateRangeDescription = $"Mostrando: {start.Value:dd MMM yyyy} - {end.Value:dd MMM yyyy}";
+            return;
+        }
+
+        if (start.HasValue)
+        {
+            DateRangeDescription = $"Mostrando: Desde {start.Value:dd MMM yyyy}";
+            return;
+        }
+
+        DateRangeDescription = $"Mostrando: Hasta {end!.Value:dd MMM yyyy}";
+    }
+
+    /// <summary>
+    /// Calcula métricas rápidas para ofrecer recomendaciones.
+    /// </summary>
+    private void UpdateInsights()
+    {
+        if (!_currentFilteredTransactions.Any())
+        {
+            SpendingInsights = "Agrega transacciones para ver estadísticas personalizadas.";
+            return;
+        }
+
+        var expenses = _currentFilteredTransactions
+            .Where(t => t.Type == TransactionType.Expense)
+            .ToList();
+
+        var startDate = _currentRangeStart ?? _currentFilteredTransactions.Min(t => t.Date).Date;
+        var endDate = _currentRangeEnd ?? _currentFilteredTransactions.Max(t => t.Date).Date;
+        var totalDays = Math.Max(1, (endDate - startDate).Days + 1);
+
+        var totalExpenses = expenses.Sum(t => t.Amount);
+        var dailyAverage = totalExpenses / totalDays;
+        var recurringCount = _currentFilteredTransactions.Count(t => t.IsRecurring);
+
+        var topCategory = expenses
+            .GroupBy(t => t.CategoryName)
+            .Select(g => new { Category = g.Key, Total = g.Sum(t => t.Amount) })
+            .OrderByDescending(g => g.Total)
+            .FirstOrDefault();
+
+        if (topCategory == null || topCategory.Total <= 0)
+        {
+            SpendingInsights = $"Promedio diario de gastos: ${dailyAverage:N2}. Transacciones recurrentes activas: {recurringCount}.";
+            return;
+        }
+
+        SpendingInsights = $"Categoría principal: {topCategory.Category} (${topCategory.Total:N2}). Promedio diario de gastos: ${dailyAverage:N2}. Recurrentes: {recurringCount}.";
+    }
+
+    /// <summary>
+    /// Carga las categorías disponibles para aplicar filtros.
+    /// </summary>
+    private async Task LoadCategoriesAsync()
+    {
+        try
+        {
+            var categories = await _categoryService.GetActiveCategoriesAsync();
+
+            _categories.Clear();
+            if (categories != null)
+            {
+                _categories.AddRange(categories.OrderBy(c => c.Name));
+            }
+
+            OnPropertyChanged(nameof(Categories));
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading categories: {ex.Message}");
+        }
     }
 
     #endregion
@@ -353,6 +560,30 @@ public partial class TransactionListViewModel : BaseViewModel
     partial void OnSearchTextChanged(string value)
     {
         Task.Delay(300).ContinueWith(_ => Search());
+    }
+
+    partial void OnSelectedCategoryChanged(CategoryDto? value)
+    {
+        if (!_suspendFilterUpdates)
+        {
+            ApplyFilters();
+        }
+    }
+
+    partial void OnShowOnlyRecurringChanged(bool value)
+    {
+        if (!_suspendFilterUpdates)
+        {
+            ApplyFilters();
+        }
+    }
+
+    partial void OnSelectedDateFilterChanged(DateFilterOption value)
+    {
+        if (!_suspendFilterUpdates)
+        {
+            ApplyFilters();
+        }
     }
 
     #endregion

@@ -2,11 +2,9 @@
 using Android.OS;
 using Android.Views;
 using Android.Widget;
-using AndroidX.ConstraintLayout.Motion.Widget;
 using AndroidX.Fragment.App;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
-using Google.Android.Material.Chip;
 using Google.Android.Material.FloatingActionButton;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Core.Enums;
@@ -14,6 +12,7 @@ using MoneyTracker.Presentation.Adapters;
 using MoneyTracker.Presentation.Extensions;
 using MoneyTracker.Presentation.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Fragment = AndroidX.Fragment.App.Fragment;
@@ -38,6 +37,13 @@ namespace MoneyTracker.Presentation.Fragments
         private TextView? _incomeText;
         private TextView? _expensesText;
         private EditText? _searchEditText;
+        private Spinner? _categorySpinner;
+        private CheckBox? _recurringCheckBox;
+        private TextView? _dateRangeText;
+        private Button? _dateAllButton;
+        private Button? _dateCurrentMonthButton;
+        private Button? _dateLast30Button;
+        private TextView? _insightsText;
         private LinearLayout? _filterChipGroup;
         private Button? _allChip;
         private Button? _incomeChip;
@@ -45,6 +51,9 @@ namespace MoneyTracker.Presentation.Fragments
         private FloatingActionButton? _fabAdd;
         private LinearLayout? _emptyStateLayout;
         private TextView? _emptyMessageText;
+        private ArrayAdapter<string>? _categoryAdapter;
+        private bool _suppressCategoryEvent;
+        private bool _suppressRecurringEvent;
 
         public override View? OnCreateView(LayoutInflater inflater, ViewGroup? container, Bundle? savedInstanceState)
         {
@@ -78,6 +87,13 @@ namespace MoneyTracker.Presentation.Fragments
             _incomeText = view.FindViewById<TextView>(Resource.Id.text_income);
             _expensesText = view.FindViewById<TextView>(Resource.Id.text_expenses);
             _searchEditText = view.FindViewById<EditText>(Resource.Id.edit_search);
+            _categorySpinner = view.FindViewById<Spinner>(Resource.Id.spinner_category);
+            _recurringCheckBox = view.FindViewById<CheckBox>(Resource.Id.checkbox_recurring);
+            _dateRangeText = view.FindViewById<TextView>(Resource.Id.text_date_range);
+            _dateAllButton = view.FindViewById<Button>(Resource.Id.button_date_all);
+            _dateCurrentMonthButton = view.FindViewById<Button>(Resource.Id.button_date_current_month);
+            _dateLast30Button = view.FindViewById<Button>(Resource.Id.button_date_last_30);
+            _insightsText = view.FindViewById<TextView>(Resource.Id.text_insights);
             _filterChipGroup = view.FindViewById<LinearLayout>(Resource.Id.chip_group_filters);
             _allChip = view.FindViewById<Button>(Resource.Id.chip_all);
             _incomeChip = view.FindViewById<Button>(Resource.Id.chip_income);
@@ -182,6 +198,24 @@ namespace MoneyTracker.Presentation.Fragments
                         case nameof(TransactionListViewModel.VisibleTransactions):
                             UpdateTransactionList();
                             break;
+                        case nameof(TransactionListViewModel.Categories):
+                            PopulateCategorySpinner();
+                            break;
+                        case nameof(TransactionListViewModel.SelectedCategory):
+                            UpdateCategorySelection();
+                            break;
+                        case nameof(TransactionListViewModel.ShowOnlyRecurring):
+                            UpdateRecurringToggle();
+                            break;
+                        case nameof(TransactionListViewModel.SelectedDateFilter):
+                            UpdateDateFilterButtons();
+                            break;
+                        case nameof(TransactionListViewModel.DateRangeDescription):
+                            UpdateDateRangeText();
+                            break;
+                        case nameof(TransactionListViewModel.SpendingInsights):
+                            UpdateInsights();
+                            break;
                     }
                 });
             };
@@ -192,6 +226,12 @@ namespace MoneyTracker.Presentation.Fragments
 
             UpdateBalanceDisplay();
             UpdateTransactionList();
+            PopulateCategorySpinner();
+            UpdateCategorySelection();
+            UpdateRecurringToggle();
+            UpdateDateFilterButtons();
+            UpdateDateRangeText();
+            UpdateInsights();
         }
 
         /// <summary>
@@ -241,32 +281,102 @@ namespace MoneyTracker.Presentation.Fragments
             }
         }
 
-        /// <summary>
-        /// Maneja el cambio de selección en los chips de filtro
-        /// </summary>
-        private void SetupFilterButtons()
+        private void PopulateCategorySpinner()
         {
-            _allChip?.SetOnClickListener(new FilterClickListener(_viewModel, null));
-            _incomeChip?.SetOnClickListener(new FilterClickListener(_viewModel, TransactionType.Income));
-            _expenseChip?.SetOnClickListener(new FilterClickListener(_viewModel, TransactionType.Expense));
+            if (_categorySpinner == null || _viewModel == null || Activity == null)
+                return;
+
+            var categories = _viewModel.Categories?.ToList() ?? new List<CategoryDto>();
+            var items = new List<string> { GetString(Resource.String.transaction_filter_all) };
+            items.AddRange(categories.Select(c => c.Name));
+
+            _categoryAdapter = new ArrayAdapter<string>(Activity, Android.Resource.Layout.SimpleSpinnerItem, items);
+            _categoryAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
+            _categorySpinner.Adapter = _categoryAdapter;
+
+            UpdateCategorySelection();
         }
 
-        private class FilterClickListener : Java.Lang.Object, View.IOnClickListener
+        private void UpdateCategorySelection()
         {
-            private readonly TransactionListViewModel? _viewModel;
-            private readonly TransactionType? _filterType;
+            if (_categorySpinner == null || _viewModel == null)
+                return;
 
-            public FilterClickListener(TransactionListViewModel? viewModel, TransactionType? filterType)
+            if (_categoryAdapter == null)
             {
-                _viewModel = viewModel;
-                _filterType = filterType;
+                PopulateCategorySpinner();
+                return;
             }
 
-            public void OnClick(View? v)
+            var categories = _viewModel.Categories?.ToList() ?? new List<CategoryDto>();
+            var selectedCategory = _viewModel.SelectedCategory;
+            var index = 0;
+
+            if (selectedCategory != null)
             {
-                _viewModel?.FilterByTypeCommand.Execute(_filterType);
+                var catIndex = categories.FindIndex(c => c.Id == selectedCategory.Id);
+                if (catIndex >= 0)
+                {
+                    index = catIndex + 1;
+                }
             }
+
+            _suppressCategoryEvent = true;
+            _categorySpinner.SetSelection(index);
+            _suppressCategoryEvent = false;
         }
+
+        private void UpdateRecurringToggle()
+        {
+            if (_recurringCheckBox == null || _viewModel == null)
+                return;
+
+            _suppressRecurringEvent = true;
+            _recurringCheckBox.Checked = _viewModel.ShowOnlyRecurring;
+            _suppressRecurringEvent = false;
+        }
+
+        private void UpdateDateFilterButtons()
+        {
+            if (_viewModel == null)
+                return;
+
+            var option = _viewModel.SelectedDateFilter;
+
+            if (_dateAllButton != null)
+                _dateAllButton.Enabled = option != TransactionListViewModel.DateFilterOption.AllTime;
+
+            if (_dateCurrentMonthButton != null)
+                _dateCurrentMonthButton.Enabled = option != TransactionListViewModel.DateFilterOption.CurrentMonth;
+
+            if (_dateLast30Button != null)
+                _dateLast30Button.Enabled = option != TransactionListViewModel.DateFilterOption.Last30Days;
+        }
+
+        private void UpdateDateRangeText()
+        {
+            if (_dateRangeText == null || _viewModel == null)
+                return;
+
+            var description = string.IsNullOrWhiteSpace(_viewModel.DateRangeDescription)
+                ? GetString(Resource.String.transaction_filter_all_dates)
+                : _viewModel.DateRangeDescription;
+
+            _dateRangeText.Text = description;
+        }
+
+        private void UpdateInsights()
+        {
+            if (_insightsText == null || _viewModel == null)
+                return;
+
+            var insights = string.IsNullOrWhiteSpace(_viewModel.SpendingInsights)
+                ? GetString(Resource.String.transaction_insights_placeholder)
+                : _viewModel.SpendingInsights;
+
+            _insightsText.Text = insights;
+        }
+
         private void SetupEventHandlers()
         {
             // FAB para agregar transacción
@@ -294,6 +404,31 @@ namespace MoneyTracker.Presentation.Fragments
                         _viewModel.SearchText = e?.Text?.ToString() ?? string.Empty;
                     }
                 };
+            }
+
+            if (_categorySpinner != null)
+            {
+                _categorySpinner.ItemSelected += OnCategorySelected;
+            }
+
+            if (_recurringCheckBox != null)
+            {
+                _recurringCheckBox.CheckedChange += OnRecurringCheckedChanged;
+            }
+
+            if (_dateAllButton != null)
+            {
+                _dateAllButton.Click += OnDateAllClicked;
+            }
+
+            if (_dateCurrentMonthButton != null)
+            {
+                _dateCurrentMonthButton.Click += OnDateCurrentMonthClicked;
+            }
+
+            if (_dateLast30Button != null)
+            {
+                _dateLast30Button.Click += OnDateLast30Clicked;
             }
 
             // ✅ FILTROS COMO BOTONES SIMPLES
@@ -346,6 +481,56 @@ namespace MoneyTracker.Presentation.Fragments
                 .Show();
         }
 
+        private void OnCategorySelected(object? sender, AdapterView.ItemSelectedEventArgs e)
+        {
+            if (_viewModel == null || _suppressCategoryEvent)
+                return;
+
+            if (e.Position <= 0)
+            {
+                if (_viewModel.SelectedCategory != null)
+                {
+                    _viewModel.SelectedCategory = null;
+                }
+
+                return;
+            }
+
+            var categories = _viewModel.Categories;
+            var index = e.Position - 1;
+            if (index >= 0 && index < categories.Count)
+            {
+                var selected = categories[index];
+                if (_viewModel.SelectedCategory == null || _viewModel.SelectedCategory.Id != selected.Id)
+                {
+                    _viewModel.SelectedCategory = selected;
+                }
+            }
+        }
+
+        private void OnRecurringCheckedChanged(object? sender, CompoundButton.CheckedChangeEventArgs e)
+        {
+            if (_viewModel == null || _suppressRecurringEvent)
+                return;
+
+            _viewModel.ShowOnlyRecurring = e.IsChecked;
+        }
+
+        private void OnDateAllClicked(object? sender, EventArgs e)
+        {
+            _viewModel?.SetDateFilterCommand.Execute(TransactionListViewModel.DateFilterOption.AllTime);
+        }
+
+        private void OnDateCurrentMonthClicked(object? sender, EventArgs e)
+        {
+            _viewModel?.SetDateFilterCommand.Execute(TransactionListViewModel.DateFilterOption.CurrentMonth);
+        }
+
+        private void OnDateLast30Clicked(object? sender, EventArgs e)
+        {
+            _viewModel?.SetDateFilterCommand.Execute(TransactionListViewModel.DateFilterOption.Last30Days);
+        }
+
         /// <summary>
         /// Limpieza cuando se destruye el fragment
         /// </summary>
@@ -363,6 +548,34 @@ namespace MoneyTracker.Presentation.Fragments
             {
                 _recyclerView.RemoveOnScrollListener(_scrollListener);
             }
+
+            if (_categorySpinner != null)
+            {
+                _categorySpinner.ItemSelected -= OnCategorySelected;
+                _categorySpinner.Adapter = null;
+            }
+
+            if (_recurringCheckBox != null)
+            {
+                _recurringCheckBox.CheckedChange -= OnRecurringCheckedChanged;
+            }
+
+            if (_dateAllButton != null)
+            {
+                _dateAllButton.Click -= OnDateAllClicked;
+            }
+
+            if (_dateCurrentMonthButton != null)
+            {
+                _dateCurrentMonthButton.Click -= OnDateCurrentMonthClicked;
+            }
+
+            if (_dateLast30Button != null)
+            {
+                _dateLast30Button.Click -= OnDateLast30Clicked;
+            }
+
+            _categoryAdapter = null;
 
             _subscriptions?.Dispose();
             _subscriptions = null;
