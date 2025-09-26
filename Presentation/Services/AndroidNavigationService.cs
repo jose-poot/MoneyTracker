@@ -1,6 +1,7 @@
 ﻿using Android.Content;
 using MoneyTracker.Presentation.Activities;
 using MoneyTracker.Presentation.Fragments;
+using MoneyTracker.Presentation.Navigation;
 using MoneyTracker.Presentation.Services.Interfaces;
 using MoneyTracker.Presentation.ViewModels;
 
@@ -139,7 +140,7 @@ public class AndroidNavigationService : INavigationService
     {
         var bundle = new Bundle();
         var json = Newtonsoft.Json.JsonConvert.SerializeObject(parameters);
-        bundle.PutString("parameters", json);
+        bundle.PutString(NavigationParameterKeys.FragmentParameters, json);
         return bundle;
     }
 }

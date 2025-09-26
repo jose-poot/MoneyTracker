@@ -5,6 +5,7 @@ using AndroidX.Fragment.App;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Core.Enums;
 using MoneyTracker.Presentation.Extensions;
+using MoneyTracker.Presentation.Navigation;
 using MoneyTracker.Presentation.ViewModels;
 using Google.Android.Material.TextField;
 using System;
@@ -54,7 +55,7 @@ namespace MoneyTracker.Presentation.Fragments
         {
             var fragment = new AddTransactionFragment();
             var args = new Bundle();
-            args.PutString("transaction_json", Newtonsoft.Json.JsonConvert.SerializeObject(transaction));
+            args.PutString(NavigationParameterKeys.FragmentParameters, Newtonsoft.Json.JsonConvert.SerializeObject(transaction));
             fragment.Arguments = args;
             return fragment;
         }
@@ -249,7 +250,7 @@ namespace MoneyTracker.Presentation.Fragments
         /// </summary>
         private void CheckEditMode()
         {
-            if (Arguments?.GetString("transaction_json") is string json && !string.IsNullOrEmpty(json))
+            if (Arguments?.GetString(NavigationParameterKeys.FragmentParameters) is string json && !string.IsNullOrEmpty(json))
             {
                 try
                 {
