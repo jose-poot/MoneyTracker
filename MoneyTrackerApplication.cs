@@ -79,32 +79,11 @@ public class MoneyTrackerApplication : Android.App.Application
             throw new InvalidOperationException("El proveedor de actividad actual no ha sido inicializado.");
         }
 
-        Func<Activity> activityProviderFunc = () => _currentActivityProvider.GetCurrentActivity();
-        Func<Context> contextProviderFunc = () => activityProviderFunc();
-
-
-        services.AddSingleton<Func<Activity>>(_ => () =>
-        {
-            var activity = CurrentActivityHolder.Current;
-            return activity ?? throw new InvalidOperationException("No hay una actividad actual registrada para navegación.");
-        });
-
-        services.AddSingleton<Func<Context>>(_ => () =>
-        {
-            return CurrentActivityHolder.Current ?? ApplicationContext!;
-        });
-
-        services.AddSingleton<IDialogService, AndroidDialogService>();
-        services.AddSingleton<INavigationService, AndroidNavigationService>();
-        services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext!));
-             
-
-        // Servicios
-        services.AddSingleton<Func<Activity>>(activityProviderFunc);
-        services.AddSingleton<Func<Context>>(contextProviderFunc);
+        services.AddSingleton<Func<Activity>>(_ => () => _currentActivityProvider.GetCurrentActivity());
+        services.AddSingleton<Func<Context>>(sp => () => sp.GetRequiredService<Func<Activity>>()());
         services.AddSingleton<IDialogService>(sp => new AndroidDialogService(sp.GetRequiredService<Func<Context>>()));
-        services.AddSingleton<INavigationService>(sp => new AndroidNavigationService(sp.GetRequiredService<Func<Activity>>(), sp));
-        services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext));
+        services.AddSingleton<INavigationService>(sp => new AndroidNavigationService(sp.GetRequiredService<Func<Activity>>()));
+        services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext ?? throw new InvalidOperationException("ApplicationContext no disponible")));
         services.AddSingleton<IMediaPickerService>(sp => new AndroidMediaPickerService(sp.GetRequiredService<Func<Activity>>()));
         services.AddSingleton<MoneyTracker.Presentation.Navigation.INavigator, MoneyTracker.Presentation.Navigation.Navigator>();
 
