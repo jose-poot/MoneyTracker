@@ -16,10 +16,22 @@
 	<string name="button_cancel">Cancelar</string>
 	<string name="button_delete">Eliminar</string>
 	<string name="button_edit">Editar</string>
-	<string name="button_add">Agregar</string>
+        <string name="button_add">Agregar</string>
 
-	<!-- Mensajes -->
-	<string name="message_transaction_saved">Transacción guardada correctamente</string>
+        <!-- Filtros de transacciones -->
+        <string name="transaction_filter_category_prompt">Selecciona una categoría</string>
+        <string name="transaction_filter_recurring">Solo recurrentes</string>
+        <string name="transaction_filter_all">Todas</string>
+        <string name="transaction_filter_income">Ingresos</string>
+        <string name="transaction_filter_expense">Gastos</string>
+        <string name="transaction_filter_all_dates">Mostrando: Todas las fechas</string>
+        <string name="transaction_filter_all_dates_short">Todo</string>
+        <string name="transaction_filter_current_month">Este mes</string>
+        <string name="transaction_filter_last_30">Últimos 30 días</string>
+        <string name="transaction_insights_placeholder">Agrega transacciones para descubrir tus patrones de gasto.</string>
+
+        <!-- Mensajes -->
+        <string name="message_transaction_saved">Transacción guardada correctamente</string>
 	<string name="message_transaction_deleted">Transacción eliminada</string>
 	<string name="message_confirm_delete">¿Estás seguro de que quieres eliminar esta transacción?</string>
 
