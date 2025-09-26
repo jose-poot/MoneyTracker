@@ -1,3 +1,5 @@
+using Android.App;
+using Android.Content;
 using Android.Runtime;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -5,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using MoneyTracker.Application.Services;
 using MoneyTracker.Infrastructure.Database;
 using MoneyTracker.Infrastructure.DependencyInjection;
+using MoneyTracker.Presentation.Services;
+using MoneyTracker.Presentation.Services.Interfaces;
 using System;
 using System.IO;
 
@@ -65,6 +69,22 @@ public class MoneyTrackerApplication : Android.App.Application
         // Configurar ruta de base de datos
         var dbPath = GetDatabasePath();
         var connectionString = $"Data Source={dbPath}";
+
+        services.AddSingleton<Func<Activity>>(_ => () =>
+        {
+            var activity = CurrentActivityHolder.Current;
+            return activity ?? throw new InvalidOperationException("No hay una actividad actual registrada para navegación.");
+        });
+
+        services.AddSingleton<Func<Context>>(_ => () =>
+        {
+            return CurrentActivityHolder.Current ?? ApplicationContext!;
+        });
+
+        services.AddSingleton<IDialogService, AndroidDialogService>();
+        services.AddSingleton<INavigationService, AndroidNavigationService>();
+        services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext!));
+
         // Servicios
         services.AddSingleton<MoneyTracker.Presentation.Navigation.INavigator, MoneyTracker.Presentation.Navigation.Navigator>();
 

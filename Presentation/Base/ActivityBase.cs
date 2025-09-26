@@ -1,8 +1,10 @@
 ﻿using Android.Content;
+using Android.OS;
 using AndroidX.AppCompat.App;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using MoneyTracker.Presentation.Extensions;
+using MoneyTracker.Presentation.Services;
 using MoneyTracker.Presentation.Services.Interfaces;
 
 namespace MoneyTracker.Presentation.Base;
@@ -22,6 +24,7 @@ public abstract class ActivityBase<TViewModel> : AppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        CurrentActivityHolder.Register(this);
 
         // Initialize services
         var serviceProvider = MoneyTrackerApplication.ServiceProvider!;
@@ -34,6 +37,18 @@ public abstract class ActivityBase<TViewModel> : AppCompatActivity
 
         // Load parameters if any
         LoadParameters();
+    }
+
+    protected override void OnResume()
+    {
+        base.OnResume();
+        CurrentActivityHolder.Register(this);
+    }
+
+    protected override void OnPause()
+    {
+        CurrentActivityHolder.Unregister(this);
+        base.OnPause();
     }
 
     /// <summary>
@@ -77,6 +92,7 @@ public abstract class ActivityBase<TViewModel> : AppCompatActivity
 
     protected override void OnDestroy()
     {
+        CurrentActivityHolder.Unregister(this);
         _subscriptions?.Dispose();
         _bindingSet?.Dispose();
 

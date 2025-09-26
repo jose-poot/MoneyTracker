@@ -1,11 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Application.Services;
 using MoneyTracker.Core.Enums;
 using MoneyTracker.Presentation.Collections;
-using MoneyTracker.Presentation.Messages;
+using MoneyTracker.Presentation.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +26,13 @@ public partial class TransactionListViewModel : BaseViewModel
     private DateTime? _currentRangeEnd;
     private bool _suspendFilterUpdates;
 
-    public TransactionListViewModel(TransactionAppService transactionService, CategoryAppService categoryService)
+    public TransactionListViewModel(
+        TransactionAppService transactionService,
+        CategoryAppService categoryService,
+        IDialogService dialogService,
+        INavigationService navigationService,
+        ICacheService? cacheService = null)
+        : base(dialogService, navigationService, cacheService)
     {
         _transactionService = transactionService;
         _categoryService = categoryService;
@@ -251,22 +256,30 @@ public partial class TransactionListViewModel : BaseViewModel
     /// Navegar a agregar transacción
     /// </summary>
     [RelayCommand]
-    private void NavigateToAddTransaction()
+    private async Task NavigateToAddTransaction()
     {
-        // Notificar a la UI para navegar
-        WeakReferenceMessenger.Default.Send(new NavigateToAddTransactionMessage());
+        if (NavigationService == null)
+        {
+            return;
+        }
+
+        await NavigationService.NavigateToAsync("AddTransaction");
     }
 
     /// <summary>
     /// Editar una transacción
     /// </summary>
     [RelayCommand]
-    private void EditTransaction(TransactionDto transaction)
+    private async Task EditTransaction(TransactionDto transaction)
     {
         if (transaction == null) return;
 
-        WeakReferenceMessenger.Default.Send(new NavigateToEditTransactionMessage(transaction));
+        if (NavigationService == null)
+        {
+            return;
+        }
 
+        await NavigationService.NavigateToAsync("EditTransaction", transaction);
     }
 
     /// <summary>
@@ -292,13 +305,17 @@ public partial class TransactionListViewModel : BaseViewModel
                 HasTransactions = _allTransactions.Any();
                 EmptyMessage = GetEmptyMessage();
 
-                WeakReferenceMessenger.Default.Send(new ShowMessageMessage("Transacción eliminada correctamente"));
+                await ShowMessageAsync("Transacción eliminada correctamente");
             }
             else
             {
                 // Mostrar errores
                 var errorMessage = string.Join("\n", result.Errors);
-                WeakReferenceMessenger.Default.Send(new ShowErrorMessage("Ocurrió un error"));
+                if (DialogService != null)
+                {
+                    var message = string.IsNullOrWhiteSpace(errorMessage) ? "Ocurrió un error" : errorMessage;
+                    await DialogService.ShowErrorAsync(message);
+                }
             }
         });
     }
