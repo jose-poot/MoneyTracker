@@ -20,7 +20,10 @@ public sealed class UserRepository : Repository<User>, IUserRepository
         _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.IsActive);
 
     // Option A1: delegate to the base class (which persists internally)
-    public override Task<User> UpdateAsync(User user) => base.UpdateAsync(user); // base calls SaveChangesAsync
+    async Task IUserRepository.UpdateAsync(User user)
+    {
+        _ = await base.UpdateAsync(user);
+    }
 
     // If the interface requires exposing SaveChangesAsync, implement it properly:
     public Task<int> SaveChangesAsync() => _context.SaveChangesAsync();
