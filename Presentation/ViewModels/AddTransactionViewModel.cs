@@ -31,7 +31,6 @@ public partial class AddTransactionViewModel : BaseViewModel
 
         Title = "Nueva Transacción";
         Categories = new ObservableCollection<CategoryDto>();
-        ValidationErrors = new ObservableCollection<string>();
 
         TransactionDate = DateTime.Now;
         TransactionType = TransactionType.Expense;
@@ -56,8 +55,7 @@ public partial class AddTransactionViewModel : BaseViewModel
     [ObservableProperty] private bool _hasValidationErrors;
     [ObservableProperty] private bool _canSave;
 
-    public new ObservableCollection<CategoryDto> Categories { get; }
-    public new ObservableCollection<string> ValidationErrors { get; }
+    public ObservableCollection<CategoryDto> Categories { get; }
 
     #region Propiedades Calculadas
 

@@ -4,7 +4,7 @@ using MoneyTracker.Core.Interfaces.Repositories;
 
 namespace MoneyTracker.Application.Validators;
 
-// <summary>
+/// <summary>
 /// Validador para CategoryDto
 /// </summary>
 public class CategoryValidator : AbstractValidator<CategoryDto>

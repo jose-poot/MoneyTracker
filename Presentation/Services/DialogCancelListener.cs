@@ -13,7 +13,7 @@ public partial class AndroidDialogService
             _onCancel = onCancel;
         }
 
-        public void OnCancel(IDialogInterface dialog)
+        public void OnCancel(IDialogInterface? dialog)
         {
             _onCancel();
         }

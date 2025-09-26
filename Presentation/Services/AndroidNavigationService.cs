@@ -1,8 +1,8 @@
-﻿using Android.Content;
-
+using Android.App;
+using Android.Content;
 using Android.OS;
 using AndroidX.AppCompat.App;
-using AndroidX.Fragment.App;
+using Fragment = AndroidX.Fragment.App.Fragment;
 
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Presentation.Activities;
@@ -94,13 +94,14 @@ public class AndroidNavigationService : INavigationService
         {
             // Clear back stack
             appActivity.SupportFragmentManager.PopBackStack(null,
-                FragmentManager.PopBackStackInclusive);
+                (int)AndroidX.Fragment.App.FragmentManager.PopBackStackInclusive);
         }
 
         return Task.CompletedTask;
     }
 
-    private Task NavigateToFragment<TFragment>(object? parameters, string? backStackTag = null) where TFragment : Fragment, new()
+    private Task NavigateToFragment<TFragment>(object? parameters, string? backStackTag = null)
+        where TFragment : Fragment, new()
     {
         var fragment = new TFragment();
         var tag = backStackTag ?? typeof(TFragment).Name;
