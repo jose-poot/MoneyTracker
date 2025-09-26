@@ -1,7 +1,9 @@
 ﻿using Android.Content;
+
 using Android.OS;
 using AndroidX.AppCompat.App;
 using AndroidX.Fragment.App;
+
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Presentation.Activities;
 using MoneyTracker.Presentation.Fragments;
@@ -168,7 +170,20 @@ public class AndroidNavigationService : INavigationService
     {
         var bundle = new Bundle();
         var json = Newtonsoft.Json.JsonConvert.SerializeObject(parameters);
+
+
+        if (parameters is TransactionDto)
+        {
+            bundle.PutString("transaction_json", json);
+        }
+        else
+        {
+            bundle.PutString("parameters", json);
+        }
+
+
         bundle.PutString(NavigationParameterKeys.FragmentParameters, json);
+
         return bundle;
     }
 }

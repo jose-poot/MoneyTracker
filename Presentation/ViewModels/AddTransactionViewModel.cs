@@ -1,12 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Application.Services;
 using MoneyTracker.Core.Enums;
-using MoneyTracker.Presentation.Messages;
 using MoneyTracker.Presentation.Services.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MoneyTracker.Presentation.ViewModels;
 
@@ -17,19 +19,15 @@ public partial class AddTransactionViewModel : BaseViewModel
 {
     private readonly TransactionAppService _transactionService;
     private readonly CategoryAppService _categoryService;
-    private readonly IDialogService _dialogService;
-    private readonly INavigationService _navigationService;
-
     public AddTransactionViewModel(
         TransactionAppService transactionService,
         CategoryAppService categoryService,
         IDialogService dialogService,
         INavigationService navigationService)
+        : base(dialogService, navigationService)
     {
         _transactionService = transactionService;
         _categoryService = categoryService;
-        _dialogService = dialogService;
-        _navigationService = navigationService;
 
         Title = "Nueva Transacción";
         Categories = new ObservableCollection<CategoryDto>();
@@ -154,7 +152,10 @@ public partial class AddTransactionViewModel : BaseViewModel
     [RelayCommand]
     private async Task CancelAsync()
     {
-        await _navigationService.NavigateBackAsync();
+        if (NavigationService != null)
+        {
+            await NavigationService.NavigateBackAsync();
+        }
     }
 
 
@@ -230,13 +231,19 @@ public partial class AddTransactionViewModel : BaseViewModel
 
         if (success && transaction != null)
         {
-            _dialogService.ShowToast("Transacción creada correctamente");
-            await _navigationService.NavigateBackAsync();
+            DialogService?.ShowToast("Transacción creada correctamente");
+            if (NavigationService != null)
+            {
+                await NavigationService.NavigateBackAsync();
+            }
         }
         else
         {
-            await _dialogService.ShowErrorAsync("Error al crear la transacción");
-            ShowValidationErrors(errors);
+            if (DialogService != null)
+            {
+                await DialogService.ShowErrorAsync("Error al crear la transacción");
+            }
+            await ShowValidationErrorsAsync(errors);
         }
     }
 
@@ -263,13 +270,15 @@ public partial class AddTransactionViewModel : BaseViewModel
 
         if (success && transaction != null)
         {
-            WeakReferenceMessenger.Default.Send(new TransactionUpdatedMessage(transaction));
-            WeakReferenceMessenger.Default.Send(new ShowMessageMessage("Transacción actualizada correctamente"));
-            WeakReferenceMessenger.Default.Send(new NavigateBackMessage());
+            DialogService?.ShowToast("Transacción actualizada correctamente");
+            if (NavigationService != null)
+            {
+                await NavigationService.NavigateBackAsync();
+            }
         }
         else
         {
-            ShowValidationErrors(errors);
+            await ShowValidationErrorsAsync(errors);
         }
     }
 
@@ -322,14 +331,23 @@ public partial class AddTransactionViewModel : BaseViewModel
         HasValidationErrors = false;
     }
 
-    private void ShowValidationErrors(System.Collections.Generic.List<string> errors)
+    private async Task ShowValidationErrorsAsync(System.Collections.Generic.List<string>? errors)
     {
         ClearValidationErrors();
+
+        if (errors == null || errors.Count == 0)
+        {
+            AddValidationError("Ocurrió un error inesperado");
+            errors = ValidationErrors.ToList();
+        }
 
         foreach (var error in errors)
             AddValidationError(error);
 
-        WeakReferenceMessenger.Default.Send(new ShowErrorMessage("Por favor corrige los errores indicados"));
+        if (DialogService != null)
+        {
+            await DialogService.ShowErrorAsync("Por favor corrige los errores indicados");
+        }
     }
 
     #endregion

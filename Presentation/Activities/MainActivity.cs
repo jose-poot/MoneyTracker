@@ -1,9 +1,17 @@
 ﻿using Android.App;
 using Android.OS;
 using Android.Views;
+
+using AndroidX.AppCompat.App;
+using Microsoft.Extensions.DependencyInjection;
+using Java.Lang;
+
+using MoneyTracker.Presentation.Fragments;
+
 using MoneyTracker.Presentation.Fragments;
 using MoneyTracker.Presentation.Base;
 using MoneyTracker.Presentation.ViewModels;
+
 
 namespace MoneyTracker.Presentation.Activities
 {
