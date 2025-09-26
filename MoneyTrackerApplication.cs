@@ -22,6 +22,7 @@ namespace MoneyTracker;
 public class MoneyTrackerApplication : Android.App.Application
 {
     public static IServiceProvider? ServiceProvider { get; private set; }
+    private CurrentActivityProvider? _currentActivityProvider;
 
     public MoneyTrackerApplication(IntPtr handle, JniHandleOwnership transer)
         : base(handle, transer)
@@ -34,6 +35,9 @@ public class MoneyTrackerApplication : Android.App.Application
 
         try
         {
+            _currentActivityProvider = new CurrentActivityProvider();
+            RegisterActivityLifecycleCallbacks(_currentActivityProvider);
+
             // Configurar inyección de dependencias
             ConfigureServices();
 
@@ -69,6 +73,15 @@ public class MoneyTrackerApplication : Android.App.Application
         // Configurar ruta de base de datos
         var dbPath = GetDatabasePath();
         var connectionString = $"Data Source={dbPath}";
+ 
+        if (_currentActivityProvider == null)
+        {
+            throw new InvalidOperationException("El proveedor de actividad actual no ha sido inicializado.");
+        }
+
+        Func<Activity> activityProviderFunc = () => _currentActivityProvider.GetCurrentActivity();
+        Func<Context> contextProviderFunc = () => activityProviderFunc();
+
 
         services.AddSingleton<Func<Activity>>(_ => () =>
         {
@@ -84,8 +97,15 @@ public class MoneyTrackerApplication : Android.App.Application
         services.AddSingleton<IDialogService, AndroidDialogService>();
         services.AddSingleton<INavigationService, AndroidNavigationService>();
         services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext!));
+             
 
         // Servicios
+        services.AddSingleton<Func<Activity>>(activityProviderFunc);
+        services.AddSingleton<Func<Context>>(contextProviderFunc);
+        services.AddSingleton<IDialogService>(sp => new AndroidDialogService(sp.GetRequiredService<Func<Context>>()));
+        services.AddSingleton<INavigationService>(sp => new AndroidNavigationService(sp.GetRequiredService<Func<Activity>>(), sp));
+        services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext));
+        services.AddSingleton<IMediaPickerService>(sp => new AndroidMediaPickerService(sp.GetRequiredService<Func<Activity>>()));
         services.AddSingleton<MoneyTracker.Presentation.Navigation.INavigator, MoneyTracker.Presentation.Navigation.Navigator>();
 
         // ViewModels
@@ -138,6 +158,10 @@ public class MoneyTrackerApplication : Android.App.Application
             _ = ServiceProvider!.GetRequiredService<MoneyTrackerContext>();
             _ = ServiceProvider.GetRequiredService<TransactionAppService>();
             _ = ServiceProvider.GetRequiredService<CategoryAppService>();
+            _ = ServiceProvider.GetRequiredService<IDialogService>();
+            _ = ServiceProvider.GetRequiredService<INavigationService>();
+            _ = ServiceProvider.GetRequiredService<ICacheService>();
+            _ = ServiceProvider.GetRequiredService<IMediaPickerService>();
 
             System.Diagnostics.Debug.WriteLine("✅ Service configuration validated successfully");
         }
@@ -200,6 +224,11 @@ public class MoneyTrackerApplication : Android.App.Application
             using var scope = ServiceProvider?.CreateScope();
             var context = scope?.ServiceProvider.GetService<MoneyTrackerContext>();
             context?.Dispose();
+
+            if (_currentActivityProvider != null)
+            {
+                UnregisterActivityLifecycleCallbacks(_currentActivityProvider);
+            }
 
             // Dispose del ServiceProvider
             if (ServiceProvider is IDisposable disposable)
