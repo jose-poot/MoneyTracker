@@ -10,11 +10,11 @@ using System.Runtime.CompilerServices;
 namespace MoneyTracker.Presentation.ViewModels
 {
     /// <summary>
-    /// ViewModel base optimizado para memoria y performance con servicios inyectados
+    /// Base ViewModel optimized for memory and performance with injected services.
     /// </summary>
     public abstract partial class BaseViewModel : ObservableObject, IDisposable
     {
-        // Services (inyectados via constructor en clases derivadas)
+        // Services injected via constructor in derived classes.
         protected readonly IDialogService? DialogService;
         protected readonly INavigationService? NavigationService;
         protected readonly ICacheService? CacheService;
@@ -22,7 +22,7 @@ namespace MoneyTracker.Presentation.ViewModels
         private readonly CompositeDisposable _subscriptions = new();
         private volatile bool _isDisposed;
 
-        // Cache para PropertyChangedEventArgs para reducir allocations
+        // Cache PropertyChangedEventArgs to reduce allocations.
         private static readonly ConcurrentDictionary<string, PropertyChangedEventArgs> _propertyArgsCache = new();
 
         #region Observable Properties
@@ -56,7 +56,6 @@ namespace MoneyTracker.Presentation.ViewModels
 
         protected BaseViewModel()
         {
-            RegisterMessageHandlers();
         }
 
         protected BaseViewModel(IDialogService dialogService, INavigationService navigationService, ICacheService? cacheService = null)
@@ -64,23 +63,17 @@ namespace MoneyTracker.Presentation.ViewModels
             DialogService = dialogService;
             NavigationService = navigationService;
             CacheService = cacheService;
-            RegisterMessageHandlers();
         }
 
         #endregion
 
         #region Virtual Methods
 
-        protected virtual void RegisterMessageHandlers()
-        {
-            // Override en ViewModels específicos para registrar mensaje handlers
-        }
-
         protected virtual Task OnRefreshRequested() => Task.CompletedTask;
 
         protected virtual void OnErrorOccurred(string errorMessage)
         {
-            // Override para manejo específico de errores
+            // Override to implement specific error handling.
         }
 
         #endregion
@@ -190,13 +183,13 @@ namespace MoneyTracker.Presentation.ViewModels
 
         private static string GetUserFriendlyError(Exception ex) => ex switch
         {
-            ArgumentException => "Los datos ingresados no son válidos",
-            InvalidOperationException => "No se puede realizar esta operación en este momento",
-            UnauthorizedAccessException => "Sin permisos para realizar esta acción",
-            System.Net.Http.HttpRequestException => "Error de conexión. Verifica tu internet",
-            TaskCanceledException => "La operación tardó demasiado tiempo",
-            TimeoutException => "La operación tardó demasiado tiempo",
-            _ => "Ocurrió un error inesperado. Intenta nuevamente"
+            ArgumentException => "The provided data is not valid.",
+            InvalidOperationException => "This operation cannot be completed right now.",
+            UnauthorizedAccessException => "You do not have permission to perform this action.",
+            System.Net.Http.HttpRequestException => "Connection error. Please check your internet connection.",
+            TaskCanceledException => "The operation took too long.",
+            TimeoutException => "The operation took too long.",
+            _ => "An unexpected error occurred. Please try again."
         };
 
         #endregion
@@ -322,7 +315,7 @@ namespace MoneyTracker.Presentation.ViewModels
 
             try
             {
-                base.OnPropertyChanged(propertyName); // Llamar al método base
+                base.OnPropertyChanged(propertyName); // Call base implementation
             }
             catch (Exception ex)
             {

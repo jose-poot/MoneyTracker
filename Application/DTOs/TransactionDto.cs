@@ -4,49 +4,49 @@ using System.ComponentModel.DataAnnotations;
 namespace MoneyTracker.Application.DTOs
 {
     /// <summary>
-    /// DTO para transferir datos de transacciones a la UI
-    /// Contiene solo los datos necesarios para la presentación
+    /// DTO used to transfer transaction data to the UI.
+    /// Contains only the data required for presentation.
     /// </summary>
     public class TransactionDto
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "La descripción es obligatoria")]
-        [StringLength(200, ErrorMessage = "La descripción no puede tener más de 200 caracteres")]
+        [Required(ErrorMessage = "The description is required")]
+        [StringLength(200, ErrorMessage = "The description cannot exceed 200 characters")]
         public string Description { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "El monto es obligatorio")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "El monto debe ser mayor a cero")]
+        [Required(ErrorMessage = "The amount is required")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "The amount must be greater than zero")]
         public decimal Amount { get; set; }
 
         public string Currency { get; set; } = "USD";
 
-        [Required(ErrorMessage = "El tipo de transacción es obligatorio")]
+        [Required(ErrorMessage = "The transaction type is required")]
         public TransactionType Type { get; set; }
 
-        [Required(ErrorMessage = "Debe seleccionar una categoría")]
+        [Required(ErrorMessage = "A category must be selected")]
         public int CategoryId { get; set; }
 
         public string CategoryName { get; set; } = string.Empty;
         public string CategoryColor { get; set; } = "#2196F3";
         public string CategoryIcon { get; set; } = "category";
 
-        [Required(ErrorMessage = "La fecha es obligatoria")]
+        [Required(ErrorMessage = "The date is required")]
         public DateTime Date { get; set; } = DateTime.Now;
 
         public string? Notes { get; set; }
         public string? Location { get; set; }
         public bool IsRecurring { get; set; }
 
-        // Propiedades calculadas para la UI
+        // Calculated properties for the UI
         public string FormattedAmount => Type == TransactionType.Income
             ? $"+${Amount:N2}"
             : $"-${Amount:N2}";
 
         public string FormattedDate => Date.ToString("dd/MM/yyyy");
-        public string TypeDisplayName => Type == TransactionType.Income ? "Ingreso" : "Gasto";
+        public string TypeDisplayName => Type == TransactionType.Income ? "Income" : "Expense";
 
-        // Para validación en tiempo real en la UI
+        // Used for real-time UI validation
         public bool IsValid { get; set; }
         public List<string> ValidationErrors { get; set; } = new();
     }

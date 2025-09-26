@@ -49,7 +49,7 @@ namespace MoneyTracker.Presentation.Activities
         public override bool OnCreateOptionsMenu(IMenu? menu)
         {
             base.OnCreateOptionsMenu(menu);
-            // Forzamos overload con ICharSequence para evitar cast a resourceId (int)
+            // Force the overload with ICharSequence to avoid casting to a resource ID (int)
             menu?.Add(0, 1001, 0, new Java.Lang.String("Settings"));
             return true;
         }

@@ -9,7 +9,7 @@ public sealed class UserRepository : Repository<User>, IUserRepository
 {
     public UserRepository(MoneyTrackerContext context) : base(context) { }
 
-    // Lecturas sin tracking (opcional, recomendado para solo-lectura)
+    // Use no-tracking reads (optional, recommended for read-only scenarios)
     public override Task<User?> GetByIdAsync(int id) =>
         _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
 
@@ -19,9 +19,9 @@ public sealed class UserRepository : Repository<User>, IUserRepository
     public Task<User?> GetActiveAsync() =>
         _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.IsActive);
 
-    // Opción A1: delegar al base (que guarda internamente)
-    public override Task<User> UpdateAsync(User user) => base.UpdateAsync(user); // base llama SaveChangesAsync
+    // Option A1: delegate to the base class (which persists internally)
+    public override Task<User> UpdateAsync(User user) => base.UpdateAsync(user); // base calls SaveChangesAsync
 
-    // Si tu interfaz exige exponer SaveChangesAsync, impleméntalo correctamente:
+    // If the interface requires exposing SaveChangesAsync, implement it properly:
     public Task<int> SaveChangesAsync() => _context.SaveChangesAsync();
 }

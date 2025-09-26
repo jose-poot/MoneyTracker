@@ -10,7 +10,7 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<TrimMode>full</TrimMode>
 
-		<!-- ✅ CRÍTICO: DESHABILITAR WARNINGS AS ERRORS -->
+             <!-- ✅ CRITICAL: Disable warnings as errors -->
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 	</PropertyGroup>
 
@@ -36,7 +36,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
 
-		<!-- MAPPING Y VALIDACIÓN -->
+             <!-- MAPPING AND VALIDATION -->
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="FluentValidation" Version="11.8.0" />
@@ -50,7 +50,7 @@
 		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.11.0.1" />
 		<PackageReference Include="Xamarin.AndroidX.SwipeRefreshLayout" Version="1.1.0.15" />
 
-		<!-- ✅ REMOVER PAQUETES CONFLICTIVOS - Dejar que Material los resuelva automáticamente -->
+             <!-- ✅ REMOVE CONFLICTING PACKAGES - Let Material resolve them automatically -->
 		<!-- NO incluir AppCompat, ConstraintLayout, Fragment, RecyclerView manualmente -->
 	</ItemGroup>
 </Project>

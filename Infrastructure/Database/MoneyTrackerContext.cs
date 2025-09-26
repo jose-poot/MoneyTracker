@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MoneyTracker.Infrastructure.Database;
 
 /// <summary>
-/// Contexto de Entity Framework que representa nuestra base de datos
+/// Entity Framework context that represents the application database.
 /// </summary>
 public class MoneyTrackerContext : DbContext
 {
@@ -15,33 +15,33 @@ public class MoneyTrackerContext : DbContext
     {
     }
 
-    // DbSets - Representan las tablas en la base de datos
+    // DbSets - Represent tables within the database
     public DbSet<Transaction> Transactions { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
 
     /// <summary>
-    /// Configuración del modelo de datos
+    /// Configures the data model.
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Aplicar todas las configuraciones automáticamente
+        // Apply every configuration automatically
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        // Datos iniciales (Seed Data)
+        // Seed initial data
         SeedInitialData(modelBuilder);
     }
 
     /// <summary>
-    /// Configuración adicional de la conexión
+    /// Additional connection configuration.
     /// </summary>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
         {
-            // Configuración de fallback si no se configuró externamente
+            // Fallback configuration when it was not provided externally
             var dbPath = Path.Combine(
                 Android.App.Application.Context.GetExternalFilesDir(null)!.AbsolutePath,
                 "MoneyTracker.db"
@@ -50,7 +50,7 @@ public class MoneyTrackerContext : DbContext
             optionsBuilder.UseSqlite($"Data Source={dbPath}");
         }
 
-        // Configuraciones adicionales para desarrollo
+        // Additional settings for development
 #if DEBUG
         optionsBuilder.EnableSensitiveDataLogging();
         optionsBuilder.EnableDetailedErrors();
@@ -58,18 +58,18 @@ public class MoneyTrackerContext : DbContext
     }
 
     /// <summary>
-    /// Intercepta el SaveChanges para funcionalidad adicional
+    /// Intercepts SaveChanges for additional functionality.
     /// </summary>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // Actualizar timestamps automáticamente
+        // Update timestamps automatically
         UpdateTimestamps();
 
         return await base.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
-    /// Actualiza CreatedAt/UpdatedAt automáticamente
+    /// Updates CreatedAt/UpdatedAt automatically.
     /// </summary>
     private void UpdateTimestamps()
     {
@@ -103,24 +103,24 @@ public class MoneyTrackerContext : DbContext
     }
 
     /// <summary>
-    /// Datos iniciales para la base de datos
+    /// Seeds initial data for the database.
     /// </summary>
     private void SeedInitialData(ModelBuilder modelBuilder)
     {
-        // Usuario predeterminado
+        // Default user
         modelBuilder.Entity<User>().HasData(
             new User
             {
                 Id = 1,
-                Name = "Usuario Principal",
-                Email = "usuario@moneytracker.com",
+                Name = "Primary User",
+                Email = "user@moneytracker.com",
                 Currency = "USD",
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true
             }
         );
 
-        // Categorías predeterminadas
+        // Default categories
         var defaultCategories = Category.GetDefaultCategories();
         for (int i = 0; i < defaultCategories.Count; i++)
         {

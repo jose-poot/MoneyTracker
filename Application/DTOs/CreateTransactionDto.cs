@@ -4,34 +4,34 @@ using System.ComponentModel.DataAnnotations;
 namespace MoneyTracker.Application.DTOs;
 
 /// <summary>
-/// DTO específico para crear nuevas transacciones
-/// Contiene solo los campos necesarios para la creación
+/// DTO used to create new transactions.
+/// Contains only the fields required for creation.
 /// </summary>
 public class CreateTransactionDto
 {
-    [Required(ErrorMessage = "La descripción es obligatoria")]
-    [StringLength(200, MinimumLength = 3, ErrorMessage = "La descripción debe tener entre 3 y 200 caracteres")]
+    [Required(ErrorMessage = "The description is required")]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "The description must be between 3 and 200 characters")]
     public string Description { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "El monto es obligatorio")]
-    [Range(0.01, 999999999.99, ErrorMessage = "El monto debe estar entre $0.01 y $999,999,999.99")]
+    [Required(ErrorMessage = "The amount is required")]
+    [Range(0.01, 999999999.99, ErrorMessage = "The amount must be between $0.01 and $999,999,999.99")]
     public decimal Amount { get; set; }
 
     public string Currency { get; set; } = "USD";
 
-    [Required(ErrorMessage = "Debe seleccionar el tipo de transacción")]
+    [Required(ErrorMessage = "The transaction type must be selected")]
     public TransactionType Type { get; set; }
 
-    [Required(ErrorMessage = "Debe seleccionar una categoría")]
-    [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar una categoría válida")]
+    [Required(ErrorMessage = "A category must be selected")]
+    [Range(1, int.MaxValue, ErrorMessage = "A valid category must be selected")]
     public int CategoryId { get; set; }
 
     public DateTime Date { get; set; } = DateTime.Now;
 
-    [StringLength(500, ErrorMessage = "Las notas no pueden tener más de 500 caracteres")]
+    [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
     public string? Notes { get; set; }
 
-    [StringLength(100, ErrorMessage = "La ubicación no puede tener más de 100 caracteres")]
+    [StringLength(100, ErrorMessage = "The location cannot exceed 100 characters")]
     public string? Location { get; set; }
 
     public bool IsRecurring { get; set; } = false;

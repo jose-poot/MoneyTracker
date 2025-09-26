@@ -1,7 +1,7 @@
 ﻿namespace MoneyTracker.Application.DTOs;
 
 /// <summary>
-/// DTO para mostrar resumen financiero en dashboard
+/// DTO used to present the financial summary on the dashboard.
 /// </summary>
 public class SummaryDto
 {
@@ -11,29 +11,29 @@ public class SummaryDto
     public decimal MonthlyBalance { get; set; }
     public string Currency { get; set; } = "USD";
 
-    // Formateo para UI
+    // UI formatting helpers
     public string FormattedBalance => FormatMoney(CurrentBalance);
     public string FormattedIncome => FormatMoney(MonthlyIncome);
     public string FormattedExpenses => FormatMoney(MonthlyExpenses);
     public string FormattedMonthlyBalance => FormatMoney(MonthlyBalance);
 
-    // Estadísticas adicionales
+    // Additional statistics
     public int TotalTransactionsThisMonth { get; set; }
     public int TotalCategoriesUsed { get; set; }
 
-    // Top categorías del mes
+    // Top categories of the month
     public List<CategorySummaryDto> TopExpenseCategories { get; set; } = new();
     public List<CategorySummaryDto> TopIncomeCategories { get; set; } = new();
 
-    // Transacciones recientes
+    // Recent transactions
     public List<TransactionDto> RecentTransactions { get; set; } = new();
 
-    // Período del resumen
+    // Summary period
     public DateTime PeriodStart { get; set; }
     public DateTime PeriodEnd { get; set; }
     public string PeriodDescription => $"{PeriodStart:MMMM yyyy}";
 
-    // Indicadores visuales para la UI
+    // Visual indicators for the UI
     public bool HasPositiveBalance => CurrentBalance > 0;
     public bool HasMonthlyProfit => MonthlyBalance > 0;
     public string BalanceColor => HasPositiveBalance ? "#4CAF50" : "#F44336";

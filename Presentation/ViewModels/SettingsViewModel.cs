@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 namespace MoneyTracker.Presentation.ViewModels;
 
 /// <summary>
-/// ViewModel de Settings (persistencia en DB vía UserAppService)
-/// Sigue el mismo patrón que TransactionListViewModel:
-/// - [ObservableProperty] en campos privados con _
-/// - [RelayCommand] para comandos generados
+/// Settings ViewModel (persisted in the database through UserAppService).
+/// Follows the same pattern as TransactionListViewModel:
+/// - [ObservableProperty] on private fields with a leading underscore
+/// - [RelayCommand] for generated commands
 /// </summary>
 public partial class SettingsViewModel : BaseViewModel
 {
     private readonly UserAppService _users;
 
-    // ===== Observables (mismo estilo: campos privados con _) =====
+    // ===== Observable properties (same style: private fields with _) =====
     [ObservableProperty]
     private string _userName = string.Empty;
 
@@ -43,14 +43,14 @@ public partial class SettingsViewModel : BaseViewModel
     {
         _users = users;
         Title = "Settings";
-        // Carga inicial al estilo de tu TransactionListViewModel
+        // Initial load mimicking the TransactionListViewModel style
         _ = LoadAsync();
     }
 
-    #region Comandos
+    #region Commands
 
     /// <summary>
-    /// Cargar datos de usuario desde DB
+    /// Loads user data from the database.
     /// </summary>
     [RelayCommand]
     private async Task LoadAsync()
@@ -70,7 +70,7 @@ public partial class SettingsViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Guardar cambios en DB
+    /// Saves changes to the database.
     /// </summary>
     [RelayCommand]
     private async Task SaveAsync()
@@ -82,7 +82,7 @@ public partial class SettingsViewModel : BaseViewModel
             {
                 if (DialogService != null)
                 {
-                    await DialogService.ShowErrorAsync("Por favor ingresa un nombre de usuario.");
+                    await DialogService.ShowErrorAsync("Please enter a user name.");
                 }
                 return;
             }
@@ -102,12 +102,12 @@ public partial class SettingsViewModel : BaseViewModel
             {
                 if (DialogService != null)
                 {
-                    await DialogService.ShowErrorAsync(error ?? "No se pudo guardar.");
+                    await DialogService.ShowErrorAsync(error ?? "The settings could not be saved.");
                 }
                 return;
             }
 
-            DialogService?.ShowToast("Settings guardados.");
+            DialogService?.ShowToast("Settings saved.");
         });
     }
 

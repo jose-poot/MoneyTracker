@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace MoneyTracker.Presentation.ViewModels;
 
 /// <summary>
-/// ViewModel para agregar/editar transacciones
+/// ViewModel used to add or edit transactions.
 /// </summary>
 public partial class AddTransactionViewModel : BaseViewModel
 {
@@ -29,7 +29,7 @@ public partial class AddTransactionViewModel : BaseViewModel
         _transactionService = transactionService;
         _categoryService = categoryService;
 
-        Title = "Nueva Transacción";
+        Title = "New Transaction";
         Categories = new ObservableCollection<CategoryDto>();
 
         TransactionDate = DateTime.Now;
@@ -57,34 +57,34 @@ public partial class AddTransactionViewModel : BaseViewModel
 
     public ObservableCollection<CategoryDto> Categories { get; }
 
-    #region Propiedades Calculadas
+    #region Calculated Properties
 
     /// <summary>
-    /// Texto del botón principal
+    /// Text displayed on the primary button.
     /// </summary>
-    public string SaveButtonText => IsEditMode ? "Actualizar" : "Guardar";
+    public string SaveButtonText => IsEditMode ? "Update" : "Save";
 
     /// <summary>
-    /// Monto formateado para mostrar
+    /// Formatted amount for display.
     /// </summary>
     public string FormattedAmount => Amount > 0 ? $"${Amount:N2}" : "$0.00";
 
     /// <summary>
-    /// Indica si es un gasto (para cambiar colores de UI)
+    /// Indicates whether it is an expense (used to adjust UI colors).
     /// </summary>
     public bool IsExpense => TransactionType == TransactionType.Expense;
 
     /// <summary>
-    /// Color del tipo de transacción
+    /// Color associated with the transaction type.
     /// </summary>
     public string TypeColor => IsExpense ? "#F44336" : "#4CAF50";
 
     #endregion
 
-    #region Comandos
+    #region Commands
 
     /// <summary>
-    /// Carga las categorías disponibles
+    /// Loads the available categories.
     /// </summary>
     [RelayCommand]
     private async Task LoadCategoriesAsync()
@@ -99,7 +99,7 @@ public partial class AddTransactionViewModel : BaseViewModel
                 Categories.Add(category);
             }
 
-            // Seleccionar primera categoría por defecto si no hay ninguna seleccionada
+            // Select the first category by default when none is selected
             if (SelectedCategory == null && Categories.Any())
             {
                 SelectedCategory = Categories.First();
@@ -108,7 +108,7 @@ public partial class AddTransactionViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Cambia el tipo de transacción
+    /// Changes the transaction type.
     /// </summary>
     [RelayCommand]
     private void ToggleTransactionType()
@@ -124,7 +124,7 @@ public partial class AddTransactionViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Guarda la transacción
+    /// Saves the transaction.
     /// </summary>
     [RelayCommand]
     private async Task SaveTransactionAsync()
@@ -145,7 +145,7 @@ public partial class AddTransactionViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Cancela la operación
+    /// Cancels the operation.
     /// </summary>
     [RelayCommand]
     private async Task CancelAsync()
@@ -158,7 +158,7 @@ public partial class AddTransactionViewModel : BaseViewModel
 
 
     /// <summary>
-    /// Limpia el formulario
+    /// Clears the form.
     /// </summary>
     [RelayCommand]
     private void ClearForm()
@@ -176,18 +176,18 @@ public partial class AddTransactionViewModel : BaseViewModel
 
     #endregion
 
-    #region Métodos Públicos
+    #region Public Methods
 
     /// <summary>
-    /// Configura el ViewModel para editar una transacción existente
+    /// Configures the ViewModel to edit an existing transaction.
     /// </summary>
     public void SetEditMode(TransactionDto transaction)
     {
         IsEditMode = true;
         TransactionId = transaction.Id;
-        Title = "Editar Transacción";
+        Title = "Edit Transaction";
 
-        // Cargar datos de la transacción
+        // Load the transaction data
         Description = transaction.Description;
         Amount = transaction.Amount;
         Currency = transaction.Currency;
@@ -197,7 +197,7 @@ public partial class AddTransactionViewModel : BaseViewModel
         Location = transaction.Location ?? string.Empty;
         IsRecurring = transaction.IsRecurring;
 
-        // Seleccionar categoría correspondiente
+        // Select the matching category
         SelectedCategory = Categories.FirstOrDefault(c => c.Id == transaction.CategoryId);
 
         ValidateForm();
@@ -205,10 +205,10 @@ public partial class AddTransactionViewModel : BaseViewModel
 
     #endregion
 
-    #region Métodos Privados
+    #region Private Methods
 
     /// <summary>
-    /// Crea una nueva transacción
+    /// Creates a new transaction.
     /// </summary>
     private async Task CreateTransactionAsync()
     {
@@ -229,7 +229,7 @@ public partial class AddTransactionViewModel : BaseViewModel
 
         if (success && transaction != null)
         {
-            DialogService?.ShowToast("Transacción creada correctamente");
+            DialogService?.ShowToast("Transaction created successfully");
             if (NavigationService != null)
             {
                 await NavigationService.NavigateBackAsync();
@@ -239,14 +239,14 @@ public partial class AddTransactionViewModel : BaseViewModel
         {
             if (DialogService != null)
             {
-                await DialogService.ShowErrorAsync("Error al crear la transacción");
+                await DialogService.ShowErrorAsync("Failed to create the transaction");
             }
             await ShowValidationErrorsAsync(errors);
         }
     }
 
     /// <summary>
-    /// Actualiza una transacción existente
+    /// Updates an existing transaction.
     /// </summary>
     private async Task UpdateTransactionAsync()
     {
@@ -268,7 +268,7 @@ public partial class AddTransactionViewModel : BaseViewModel
 
         if (success && transaction != null)
         {
-            DialogService?.ShowToast("Transacción actualizada correctamente");
+            DialogService?.ShowToast("Transaction updated successfully");
             if (NavigationService != null)
             {
                 await NavigationService.NavigateBackAsync();
@@ -281,35 +281,35 @@ public partial class AddTransactionViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Valida el formulario completo
+    /// Validates the entire form.
     /// </summary>
     private bool ValidateForm()
     {
         ClearValidationErrors();
 
-        // Validar descripción
+        // Validate description
         if (string.IsNullOrWhiteSpace(Description))
-            AddValidationError("La descripción es obligatoria");
+            AddValidationError("The description is required");
         else if (Description.Trim().Length < 3)
-            AddValidationError("La descripción debe tener al menos 3 caracteres");
+            AddValidationError("The description must have at least 3 characters");
 
-        // Validar monto
+        // Validate amount
         if (Amount <= 0)
-            AddValidationError("El monto debe ser mayor a cero");
+            AddValidationError("The amount must be greater than zero");
         else if (Amount > 999999999)
-            AddValidationError("El monto es demasiado grande");
+            AddValidationError("The amount is too large");
 
-        // Validar categoría
+        // Validate category
         if (SelectedCategory == null)
-            AddValidationError("Debe seleccionar una categoría");
+            AddValidationError("A category must be selected");
 
-        // Validar fecha
+        // Validate date
         if (TransactionDate > DateTime.Now.AddDays(1))
-            AddValidationError("La fecha no puede ser futura");
+            AddValidationError("The date cannot be in the future");
 
-        // Validar notas (opcional)
+        // Validate notes (optional)
         if (!string.IsNullOrWhiteSpace(Notes) && Notes.Length > 500)
-            AddValidationError("Las notas no pueden tener más de 500 caracteres");
+            AddValidationError("Notes cannot exceed 500 characters");
 
         CanSave = !HasValidationErrors;
         return CanSave;
@@ -335,7 +335,7 @@ public partial class AddTransactionViewModel : BaseViewModel
 
         if (errors == null || errors.Count == 0)
         {
-            AddValidationError("Ocurrió un error inesperado");
+            AddValidationError("An unexpected error occurred");
             errors = ValidationErrors.ToList();
         }
 
@@ -344,7 +344,7 @@ public partial class AddTransactionViewModel : BaseViewModel
 
         if (DialogService != null)
         {
-            await DialogService.ShowErrorAsync("Por favor corrige los errores indicados");
+            await DialogService.ShowErrorAsync("Please fix the highlighted errors");
         }
     }
 

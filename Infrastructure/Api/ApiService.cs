@@ -5,8 +5,8 @@ using MoneyTracker.Infrastructure.Api.Models;
 namespace MoneyTracker.Infrastructure.Api;
 
 /// <summary>
-/// Servicio para integraciones con APIs externas
-/// (Tasas de cambio, sincronización en la nube, etc.)
+/// Service used for integrations with external APIs
+/// (exchange rates, cloud synchronization, etc.).
 /// </summary>
 public class ApiService
 {
@@ -24,13 +24,13 @@ public class ApiService
     }
 
     /// <summary>
-    /// Obtiene tasas de cambio actuales (ejemplo)
+    /// Retrieves current exchange rates (sample implementation).
     /// </summary>
     public async Task<ExchangeRatesResponse?> GetExchangeRatesAsync(string baseCurrency = "USD")
     {
         try
         {
-            // Ejemplo usando una API gratuita de tasas de cambio
+            // Example using a free exchange-rate API
             var response = await _httpClient.GetAsync($"https://api.exchangerate-api.com/v4/latest/{baseCurrency}");
 
             if (response.IsSuccessStatusCode)
@@ -49,13 +49,13 @@ public class ApiService
     }
 
     /// <summary>
-    /// Sincroniza datos con servidor (ejemplo para futuro)
+    /// Synchronizes data with the server (placeholder for future work).
     /// </summary>
     public async Task<bool> SyncDataAsync<T>(T data) where T : class
     {
         try
         {
-            // Aquí iría la lógica para sincronizar con tu backend
+            // Logic to synchronize with your backend would go here
             var response = await _httpClient.PostAsJsonAsync("/api/sync", data, _jsonOptions);
             return response.IsSuccessStatusCode;
         }

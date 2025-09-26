@@ -14,34 +14,34 @@ using MoneyTracker.Presentation.ViewModels;
 namespace MoneyTracker.Infrastructure.DependencyInjection;
 
 /// <summary>
-/// Extensiones para configurar la inyección de dependencias
+/// Extensions to configure dependency injection.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Registra todos los servicios de Infrastructure
+    /// Registers every Infrastructure service.
     /// </summary>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
     {
-        // Base de datos
+        // Database
         services.AddDatabase(connectionString);
 
-        // Repositorios
+        // Repositories
         services.AddRepositories();
 
-        // Servicios de dominio
+        // Domain services
         services.AddDomainServices();
 
-        // Servicios de aplicación
+        // Application services
         services.AddApplicationServices();
 
-        // Validadores
+        // Validators
         services.AddValidators();
 
         // AutoMapper
         services.AddAutoMapper(typeof(Application.Mappings.MappingProfile));
 
-        // Servicios externos
+        // External services
         services.AddExternalServices();
 
         return services;
@@ -64,7 +64,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        // Registrar repositorios como Scoped (una instancia por request/operación)
+        // Register repositories as Scoped (one instance per request/operation)
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -74,7 +74,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddDomainServices(this IServiceCollection services)
     {
-        // Servicios de dominio
+        // Domain services
         services.AddScoped<ITransactionService, TransactionDomainService>();
         services.AddScoped<MoneyCalculatorService>();
 
@@ -83,7 +83,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Servicios de aplicación
+        // Application services
         services.AddScoped<TransactionAppService>();
         services.AddScoped<CategoryAppService>();
 
@@ -95,11 +95,11 @@ public static class ServiceCollectionExtensions
         // FluentValidation
         services.AddValidatorsFromAssemblyContaining<CreateTransactionValidator>();
 
-        // Registrar validadores específicos
+        // Register specific validators
         services.AddScoped<CreateTransactionValidator>();
         services.AddScoped<CategoryValidator>();
 
-        // ✅ AGREGAR ESTOS VIEWMODELS:
+        // ✅ Register these view models:
         services.AddScoped<TransactionListViewModel>();
         services.AddScoped<AddTransactionViewModel>();
         return services;
@@ -107,7 +107,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddExternalServices(this IServiceCollection services)
     {
-        // HttpClient para APIs externas
+        // HttpClient for external APIs
         services.AddHttpClient<ApiService>(client =>
         {
             client.Timeout = TimeSpan.FromSeconds(30);

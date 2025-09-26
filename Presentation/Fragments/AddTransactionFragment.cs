@@ -5,7 +5,7 @@ using AndroidX.Fragment.App;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Core.Enums;
 using MoneyTracker.Presentation.Extensions;
-using MoneyTracker.Presentation.Navigation;
+using MoneyTracker.Presentation.Services;
 using MoneyTracker.Presentation.ViewModels;
 using Google.Android.Material.TextField;
 using System;
@@ -18,7 +18,7 @@ using Fragment = AndroidX.Fragment.App.Fragment;
 namespace MoneyTracker.Presentation.Fragments
 {
     /// <summary>
-    /// Fragment para agregar o editar transacciones
+    /// Fragment used to add or edit transactions.
     /// </summary>
     public class AddTransactionFragment : Fragment
     {
@@ -27,7 +27,7 @@ namespace MoneyTracker.Presentation.Fragments
         private CompositeDisposable? _viewModelSubscriptions;
         private CompositeDisposable? _uiEventSubscriptions;
 
-        // Controles del formulario
+        // Form controls
         private TextInputLayout? _descriptionInputLayout;
         private EditText? _descriptionEditText;
         private TextInputLayout? _amountInputLayout;
@@ -42,20 +42,20 @@ namespace MoneyTracker.Presentation.Fragments
         private EditText? _locationEditText;
         private CheckBox? _recurringCheckBox;
 
-        // ✅ CAMBIAR MaterialButton por Button genérico
+        // ✅ Replace MaterialButton with the generic Button
         private Button? _saveButton;
         private Button? _cancelButton;
         private LinearLayout? _validationErrorsLayout;
         private EventHandler<AdapterView.ItemSelectedEventArgs>? _categorySelectedHandler;
 
         /// <summary>
-        /// Crea una nueva instancia para editar una transacción
+        /// Creates a new instance configured to edit an existing transaction.
         /// </summary>
         public static AddTransactionFragment NewInstanceForEdit(TransactionDto transaction)
         {
             var fragment = new AddTransactionFragment();
             var args = new Bundle();
-            args.PutString(NavigationParameterKeys.FragmentParameters, Newtonsoft.Json.JsonConvert.SerializeObject(transaction));
+            args.PutString(NavigationKeys.FragmentParameters, Newtonsoft.Json.JsonConvert.SerializeObject(transaction));
             fragment.Arguments = args;
             return fragment;
         }
@@ -74,17 +74,17 @@ namespace MoneyTracker.Presentation.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            // Obtener ViewModel
+            // Resolve the ViewModel instance
             _viewModel = MoneyTrackerApplication.GetService<AddTransactionViewModel>();
 
-            // Verificar si es modo edición
+            // Determine whether the fragment is in edit mode
             CheckEditMode();
 
             BindViewModel();
         }
 
         /// <summary>
-        /// Inicializa todas las vistas
+        /// Initializes all views.
         /// </summary>
         private void InitializeViews(View view)
         {
@@ -102,14 +102,14 @@ namespace MoneyTracker.Presentation.Fragments
             _locationEditText = view.FindViewById<EditText>(Resource.Id.edit_location);
             _recurringCheckBox = view.FindViewById<CheckBox>(Resource.Id.checkbox_recurring);
 
-            // ✅ CAMBIAR MaterialButton por Button
+            // ✅ Use Button instead of MaterialButton
             _saveButton = view.FindViewById<Button>(Resource.Id.button_save);
             _cancelButton = view.FindViewById<Button>(Resource.Id.button_cancel);
             _validationErrorsLayout = view.FindViewById<LinearLayout>(Resource.Id.layout_validation_errors);
         }
 
         /// <summary>
-        /// Configura los event handlers
+        /// Configures the event handlers.
         /// </summary>
         private void SetupEventHandlers()
         {
@@ -246,11 +246,11 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Verifica si está en modo edición y configura el ViewModel
+        /// Checks if the fragment is in edit mode and configures the ViewModel.
         /// </summary>
         private void CheckEditMode()
         {
-            if (Arguments?.GetString(NavigationParameterKeys.FragmentParameters) is string json && !string.IsNullOrEmpty(json))
+            if (Arguments?.GetString(NavigationKeys.FragmentParameters) is string json && !string.IsNullOrEmpty(json))
             {
                 try
                 {
@@ -268,7 +268,7 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Conecta el ViewModel con la UI
+        /// Connects the ViewModel with the UI.
         /// </summary>
         private void BindViewModel()
         {
@@ -347,13 +347,13 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Carga los valores iniciales del ViewModel a la UI
+        /// Loads the initial ViewModel values into the UI.
         /// </summary>
         private void LoadInitialValues()
         {
             if (_viewModel == null) return;
 
-            // Cargar valores del ViewModel
+            // Load ViewModel values
             if (_dateEditText != null)
                 _dateEditText.Text = _viewModel.TransactionDate.ToString("dd/MM/yyyy");
 
@@ -368,7 +368,7 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Configura el spinner de categorías
+        /// Configures the category spinner.
         /// </summary>
         private void SetupCategorySpinner()
         {
@@ -384,7 +384,7 @@ namespace MoneyTracker.Presentation.Fragments
             adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             _categorySpinner.Adapter = adapter;
 
-            // Seleccionar categoría actual
+            // Select the current category
             UpdateSelectedCategory();
 
             if (_categorySelectedHandler != null)
@@ -450,7 +450,7 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Actualiza el estado de loading
+        /// Updates the loading state.
         /// </summary>
         private void UpdateBusyState()
         {
@@ -458,7 +458,7 @@ namespace MoneyTracker.Presentation.Fragments
 
             var isBusy = _viewModel.IsBusy;
 
-            // Deshabilitar controles durante operaciones
+            // Disable controls during operations
             if (_saveButton != null)
                 _saveButton.Enabled = !isBusy && _viewModel.CanSave;
 
@@ -467,13 +467,13 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Actualiza la visualización de errores de validación
+        /// Updates the validation error display.
         /// </summary>
         private void UpdateValidationErrors()
         {
             if (_validationErrorsLayout == null || _viewModel == null) return;
 
-            // Limpiar errores anteriores
+            // Clear previous errors
             _validationErrorsLayout.RemoveAllViews();
 
             if (!_viewModel.HasValidationErrors)
@@ -484,7 +484,7 @@ namespace MoneyTracker.Presentation.Fragments
 
             _validationErrorsLayout.Visibility = ViewStates.Visible;
 
-            // Agregar cada error como TextView
+            // Add each error as a TextView
             foreach (var error in _viewModel.ValidationErrors)
             {
                 var errorView = new TextView(RequireContext())
@@ -498,7 +498,7 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Muestra el selector de fecha
+        /// Displays the date picker.
         /// </summary>
         private void ShowDatePicker(object? sender, EventArgs e)
         {

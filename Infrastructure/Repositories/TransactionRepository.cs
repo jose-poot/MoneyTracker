@@ -8,7 +8,7 @@ using MoneyTracker.Infrastructure.Database;
 namespace MoneyTracker.Infrastructure.Repositories;
 
 /// <summary>
-/// Repositorio específico para transacciones con consultas optimizadas
+/// Repository specialized for transactions with optimized queries.
 /// </summary>
 public class TransactionRepository : Repository<Transaction>, ITransactionRepository
 {
@@ -17,7 +17,7 @@ public class TransactionRepository : Repository<Transaction>, ITransactionReposi
     }
 
     /// <summary>
-    /// Override para incluir Category automáticamente
+    /// Override to automatically include Category.
     /// </summary>
     public override async Task<List<Transaction>> GetAllAsync()
     {
@@ -169,7 +169,7 @@ public class TransactionRepository : Repository<Transaction>, ITransactionReposi
         {
             var result = await _dbSet
                 .Include(t => t.Category)
-                .Where(t => t.Type == TransactionType.Expense) // Solo gastos para "top"
+                .Where(t => t.Type == TransactionType.Expense) // Only expenses for the "top" calculation
                 .GroupBy(t => t.Category)
                 .Select(g => new
                 {

@@ -5,18 +5,18 @@ using MoneyTracker.Core.Entities;
 namespace MoneyTracker.Infrastructure.Configurations;
 
 /// <summary>
-/// Configuración de Entity Framework para la entidad Transaction
-/// Define cómo se mapea a la base de datos
+/// Entity Framework configuration for the Transaction entity.
+/// Defines how it maps to the database.
 /// </summary>
 public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 {
     public void Configure(EntityTypeBuilder<Transaction> builder)
     {
-        // Configuración de tabla
+        // Table configuration
         builder.ToTable("Transactions");
         builder.HasKey(t => t.Id);
 
-        // Configuración de propiedades
+        // Property configuration
         builder.Property(t => t.Id)
             .IsRequired()
             .ValueGeneratedOnAdd(); // Auto-increment
@@ -24,71 +24,71 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.Description)
             .IsRequired()
             .HasMaxLength(200)
-            .HasComment("Descripción de la transacción");
+            .HasComment("Transaction description");
 
-        // Configuración especial para Value Object Money
-        // EF no maneja Value Objects nativamente, así que los "aplanamos"
+        // Special configuration for the Money value object.
+        // EF does not handle Value Objects natively, so we flatten them.
         builder.Property(t => t.AmountValue)
             .IsRequired()
             .HasColumnName("Amount")
             .HasColumnType("decimal(18,2)")
-            .HasComment("Monto de la transacción");
+            .HasComment("Transaction amount");
 
         builder.Property(t => t.Currency)
             .IsRequired()
             .HasMaxLength(3)
             .HasDefaultValue("USD")
-            .HasComment("Código de moneda ISO");
+            .HasComment("ISO currency code");
 
-        // Enum como string para facilitar lectura
+        // Store the enum as a string for readability
         builder.Property(t => t.Type)
             .IsRequired()
             .HasConversion<string>()
             .HasMaxLength(10)
-            .HasComment("Tipo de transacción: Income o Expense");
+            .HasComment("Transaction type: Income or Expense");
 
-        // Fechas con configuración específica
+        // Date configuration
         builder.Property(t => t.Date)
             .IsRequired()
             .HasColumnType("datetime")
-            .HasComment("Fecha de la transacción");
+            .HasComment("Transaction date");
 
         builder.Property(t => t.CreatedAt)
             .IsRequired()
             .HasColumnType("datetime")
             .HasDefaultValueSql("datetime('now')")
-            .HasComment("Fecha de creación del registro");
+            .HasComment("Record creation date");
 
         builder.Property(t => t.UpdatedAt)
             .HasColumnType("datetime")
-            .HasComment("Fecha de última modificación");
+            .HasComment("Last modification date");
 
-        // Propiedades opcionales
+        // Optional properties
         builder.Property(t => t.Notes)
             .HasMaxLength(500)
-            .HasComment("Notas adicionales");
+            .HasComment("Additional notes");
 
         builder.Property(t => t.Location)
             .HasMaxLength(100)
-            .HasComment("Ubicación de la transacción");
+            .HasComment("Transaction location");
 
         builder.Property(t => t.IsRecurring)
             .IsRequired()
             .HasDefaultValue(false)
-            .HasComment("Indica si es una transacción recurrente");
+            .HasComment("Indicates whether the transaction is recurring");
 
-        // Relación con Category
+        // Relationship with Category
         builder.Property(t => t.CategoryId)
             .IsRequired()
-            .HasComment("ID de la categoría");
+            .HasComment("Category ID");
 
         builder.HasOne(t => t.Category)
             .WithMany(c => c.Transactions)
             .HasForeignKey(t => t.CategoryId)
-            .OnDelete(DeleteBehavior.Restrict) // No borrar categoría si tiene transacciones
+            .OnDelete(DeleteBehavior.Restrict) // Do not delete a category that has transactions
             .HasConstraintName("FK_Transaction_Category");
 
-        // Índices para mejorar performance
+        // Indexes to improve performance
         builder.HasIndex(t => t.Date)
             .HasDatabaseName("IX_Transaction_Date");
 
@@ -101,7 +101,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.HasIndex(t => new { t.Date, t.Type })
             .HasDatabaseName("IX_Transaction_Date_Type");
 
-        // Ignorar propiedades calculadas que no van a la BD
-        builder.Ignore(t => t.Amount); // Usamos AmountValue y Currency en su lugar
+        // Ignore calculated properties that are not stored in the database
+        builder.Ignore(t => t.Amount); // AmountValue and Currency are used instead
     }
 }

@@ -5,7 +5,7 @@ using MoneyTracker.Core.Interfaces.Repositories;
 namespace MoneyTracker.Application.Validators;
 
 /// <summary>
-/// Validador para CreateTransactionDto usando FluentValidation
+/// Validator for <see cref="CreateTransactionDto"/> using FluentValidation.
 /// </summary>
 public class CreateTransactionValidator : AbstractValidator<CreateTransactionDto>
 {
@@ -20,75 +20,75 @@ public class CreateTransactionValidator : AbstractValidator<CreateTransactionDto
 
     private void ConfigureValidationRules()
     {
-        // Regla 1: Descripción
+        // Rule 1: Description
         RuleFor(x => x.Description)
             .NotEmpty()
-            .WithMessage("La descripción es obligatoria")
+            .WithMessage("The description is required")
             .Length(3, 200)
-            .WithMessage("La descripción debe tener entre 3 y 200 caracteres")
+            .WithMessage("The description must be between 3 and 200 characters")
             .Must(BeValidDescription)
-            .WithMessage("La descripción contiene caracteres no válidos");
+            .WithMessage("The description contains invalid characters");
 
-        // Regla 2: Monto
+        // Rule 2: Amount
         RuleFor(x => x.Amount)
             .GreaterThan(0)
-            .WithMessage("El monto debe ser mayor a cero")
+            .WithMessage("The amount must be greater than zero")
             .LessThanOrEqualTo(999999999.99m)
-            .WithMessage("El monto no puede ser mayor a $999,999,999.99")
+            .WithMessage("The amount cannot exceed $999,999,999.99")
             .Must(HaveValidDecimalPlaces)
-            .WithMessage("El monto no puede tener más de 2 decimales");
+            .WithMessage("The amount cannot have more than 2 decimal places");
 
-        // Regla 3: Moneda
+        // Rule 3: Currency
         RuleFor(x => x.Currency)
             .NotEmpty()
-            .WithMessage("La moneda es obligatoria")
+            .WithMessage("The currency is required")
             .Length(3)
-            .WithMessage("La moneda debe tener exactamente 3 caracteres")
+            .WithMessage("The currency must have exactly 3 characters")
             .Must(BeValidCurrency)
-            .WithMessage("Moneda no válida");
+            .WithMessage("Invalid currency");
 
-        // Regla 4: Tipo de transacción
+        // Rule 4: Transaction type
         RuleFor(x => x.Type)
             .IsInEnum()
-            .WithMessage("Tipo de transacción no válido");
+            .WithMessage("Invalid transaction type");
 
-        // Regla 5: Categoría (validación asíncrona)
+        // Rule 5: Category (asynchronous validation)
         RuleFor(x => x.CategoryId)
             .GreaterThan(0)
-            .WithMessage("Debe seleccionar una categoría")
+            .WithMessage("A category must be selected")
             .MustAsync(CategoryExists)
-            .WithMessage("La categoría seleccionada no existe")
+            .WithMessage("The selected category does not exist")
             .MustAsync(CategoryIsActive)
-            .WithMessage("La categoría seleccionada está inactiva");
+            .WithMessage("The selected category is inactive");
 
-        // Regla 6: Fecha
+        // Rule 6: Date
         RuleFor(x => x.Date)
             .NotEmpty()
-            .WithMessage("La fecha es obligatoria")
+            .WithMessage("The date is required")
             .LessThanOrEqualTo(DateTime.Now.AddDays(1))
-            .WithMessage("La fecha no puede ser futura")
+            .WithMessage("The date cannot be in the future")
             .GreaterThan(new DateTime(2000, 1, 1))
-            .WithMessage("La fecha no puede ser anterior al año 2000");
+            .WithMessage("The date cannot be earlier than the year 2000");
 
-        // Regla 7: Notas (opcional)
+        // Rule 7: Notes (optional)
         RuleFor(x => x.Notes)
             .MaximumLength(500)
-            .WithMessage("Las notas no pueden tener más de 500 caracteres")
+            .WithMessage("Notes cannot exceed 500 characters")
             .When(x => !string.IsNullOrEmpty(x.Notes));
 
-        // Regla 8: Ubicación (opcional)
+        // Rule 8: Location (optional)
         RuleFor(x => x.Location)
             .MaximumLength(100)
-            .WithMessage("La ubicación no puede tener más de 100 caracteres")
+            .WithMessage("The location cannot exceed 100 characters")
             .When(x => !string.IsNullOrEmpty(x.Location));
     }
 
-    // Validaciones personalizadas
+    // Custom validations
     private static bool BeValidDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description)) return false;
 
-        // No permitir solo números o caracteres especiales
+        // Do not allow only numbers or special characters
         return description.Any(char.IsLetter);
     }
 
@@ -103,7 +103,7 @@ public class CreateTransactionValidator : AbstractValidator<CreateTransactionDto
         return validCurrencies.Contains(currency.ToUpperInvariant());
     }
 
-    // Validaciones asíncronas con base de datos
+    // Asynchronous validations with the database
     private async Task<bool> CategoryExists(int categoryId, CancellationToken cancellationToken)
     {
         var category = await _categoryRepository.GetByIdAsync(categoryId);

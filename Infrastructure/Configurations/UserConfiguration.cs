@@ -5,7 +5,7 @@ using MoneyTracker.Core.Entities;
 namespace MoneyTracker.Infrastructure.Configurations;
 
 /// <summary>
-/// Configuración de Entity Framework para la entidad User
+/// Entity Framework configuration for the User entity.
 /// </summary>
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
@@ -21,18 +21,18 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Name)
             .IsRequired()
             .HasMaxLength(100)
-            .HasComment("Nombre del usuario");
+            .HasComment("User name");
 
         builder.Property(u => u.Email)
             .IsRequired()
             .HasMaxLength(255)
-            .HasComment("Email del usuario");
+            .HasComment("User email");
 
         builder.Property(u => u.Currency)
             .IsRequired()
             .HasMaxLength(3)
             .HasDefaultValue("USD")
-            .HasComment("Moneda preferida del usuario");
+            .HasComment("Preferred currency");
 
         builder.Property(u => u.CreatedAt)
             .IsRequired()
@@ -46,7 +46,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasDefaultValue(true);
 
-        // Configuraciones de usuario
+        // User configuration
         builder.Property(u => u.ShowNotifications)
             .IsRequired()
             .HasDefaultValue(true);
@@ -59,7 +59,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(20)
             .HasDefaultValue("Light");
 
-        // Restricción única en email
+        // Unique constraint on email
         builder.HasIndex(u => u.Email)
             .IsUnique()
             .HasDatabaseName("IX_User_Email_Unique");

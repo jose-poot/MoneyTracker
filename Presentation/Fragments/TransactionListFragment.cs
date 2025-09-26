@@ -20,7 +20,7 @@ using Fragment = AndroidX.Fragment.App.Fragment;
 namespace MoneyTracker.Presentation.Fragments
 {
     /// <summary>
-    /// Fragment que muestra la lista de transacciones con funcionalidad de filtros
+    /// Fragment that displays the transaction list with filtering capabilities.
     /// </summary>
     public class TransactionListFragment : Fragment
     {
@@ -30,7 +30,7 @@ namespace MoneyTracker.Presentation.Fragments
         private LinearLayoutManager? _layoutManager;
         private EndlessScrollListener? _scrollListener;
 
-        // Controles de UI
+        // UI controls
         private RecyclerView? _recyclerView;
         private SwipeRefreshLayout? _swipeRefresh;
         private TextView? _balanceText;
@@ -70,14 +70,14 @@ namespace MoneyTracker.Presentation.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            // Obtener ViewModel del DI container
+            // Resolve the ViewModel from the DI container
             _viewModel = MoneyTrackerApplication.GetService<TransactionListViewModel>();
 
             BindViewModel();
         }
 
         /// <summary>
-        /// Inicializa todas las vistas del layout
+        /// Initializes every view in the layout.
         /// </summary>
         private void InitializeViews(View view)
         {
@@ -104,7 +104,7 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Configura el RecyclerView con su adapter
+        /// Configures the RecyclerView with its adapter.
         /// </summary>
         private void SetupRecyclerView()
         {
@@ -124,7 +124,7 @@ namespace MoneyTracker.Presentation.Fragments
 
                 _recyclerView.AddOnScrollListener(_scrollListener);
 
-                // Configurar callbacks del adapter
+                // Configure adapter callbacks
                 _adapter.ItemClick += OnTransactionClick;
                 _adapter.EditClick += OnTransactionEdit;
                 _adapter.DeleteClick += OnTransactionDelete;
@@ -148,7 +148,7 @@ namespace MoneyTracker.Presentation.Fragments
   
 
         /// <summary>
-        /// Conecta el ViewModel con la UI
+        /// Connects the ViewModel with the UI.
         /// </summary>
         private void BindViewModel()
         {
@@ -235,7 +235,7 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Actualiza la visualización del balance con colores
+        /// Updates the balance display with appropriate colors.
         /// </summary>
         private void UpdateBalanceDisplay()
         {
@@ -243,13 +243,13 @@ namespace MoneyTracker.Presentation.Fragments
 
             _balanceText.Text = _viewModel.FormattedBalance;
 
-            // Cambiar color según balance
+            // Change color based on the balance
             var color = Android.Graphics.Color.ParseColor(_viewModel.BalanceColor);
             _balanceText.SetTextColor(color);
         }
 
         /// <summary>
-        /// Actualiza el listado visible en el RecyclerView.
+        /// Updates the visible list in the RecyclerView.
         /// </summary>
         private void UpdateTransactionList()
         {
@@ -262,7 +262,7 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Actualiza el estado vacío de la lista
+        /// Updates the empty state view.
         /// </summary>
         private void UpdateEmptyState(int? visibleCount = null)
         {
@@ -379,7 +379,7 @@ namespace MoneyTracker.Presentation.Fragments
 
         private void SetupEventHandlers()
         {
-            // FAB para agregar transacción
+            // FAB to add a transaction
             if (_fabAdd != null)
             {
                 _fabAdd.Click += (s, e) => _viewModel?.NavigateToAddTransactionCommand.Execute(null);
@@ -394,7 +394,7 @@ namespace MoneyTracker.Presentation.Fragments
                 };
             }
 
-            // Búsqueda
+            // Search
             if (_searchEditText != null)
             {
                 _searchEditText.TextChanged += (s, e) =>
@@ -431,7 +431,7 @@ namespace MoneyTracker.Presentation.Fragments
                 _dateLast30Button.Click += OnDateLast30Clicked;
             }
 
-            // ✅ FILTROS COMO BOTONES SIMPLES
+            // ✅ Filters implemented as simple buttons
             if (_allChip != null)
             {
                 _allChip.Click += (s, e) => _viewModel?.FilterByTypeCommand.Execute(null);
@@ -448,16 +448,16 @@ namespace MoneyTracker.Presentation.Fragments
             }
         }
         /// <summary>
-        /// Maneja el click en una transacción (ver detalles)
+        /// Handles clicks on a transaction to show details.
         /// </summary>
         private void OnTransactionClick(TransactionDto transaction)
         {
-            // Por ahora, mismo comportamiento que editar
+            // For now it behaves the same as edit
             OnTransactionEdit(transaction);
         }
 
         /// <summary>
-        /// Maneja el click en editar transacción
+        /// Handles edit clicks on a transaction.
         /// </summary>
         private void OnTransactionEdit(TransactionDto transaction)
         {
@@ -465,19 +465,19 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Maneja el click en eliminar transacción
+        /// Handles delete clicks on a transaction.
         /// </summary>
         private void OnTransactionDelete(TransactionDto transaction)
         {
-            // Mostrar confirmación antes de eliminar
+            // Show confirmation before deleting
             new AndroidX.AppCompat.App.AlertDialog.Builder(RequireContext())
-                .SetTitle("Confirmar eliminación")
-                .SetMessage($"¿Estás seguro de que quieres eliminar '{transaction.Description}'?")
-                .SetPositiveButton("Eliminar", async (s, e) =>
+                .SetTitle("Confirm deletion")
+                .SetMessage($"Are you sure you want to delete '{transaction.Description}'?")
+                .SetPositiveButton("Delete", async (s, e) =>
                 {
                     await (_viewModel?.DeleteTransactionCommand.ExecuteAsync(transaction) ?? Task.CompletedTask);
                 })
-                .SetNegativeButton("Cancelar", (s, e) => { })
+                .SetNegativeButton("Cancel", (s, e) => { })
                 .Show();
         }
 
@@ -532,11 +532,11 @@ namespace MoneyTracker.Presentation.Fragments
         }
 
         /// <summary>
-        /// Limpieza cuando se destruye el fragment
+        /// Performs cleanup when the fragment is destroyed.
         /// </summary>
         public override void OnDestroyView()
         {
-            // Desconectar adapter para evitar memory leaks
+            // Detach adapter to avoid memory leaks
             if (_adapter != null)
             {
                 _adapter.ItemClick -= OnTransactionClick;

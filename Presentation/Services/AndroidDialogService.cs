@@ -42,7 +42,7 @@ public partial class AndroidDialogService : IDialogService
     }
 
     public Task<bool> ShowConfirmAsync(string title, string message,
-        string confirmText = "Confirmar", string cancelText = "Cancelar")
+        string confirmText = "Confirm", string cancelText = "Cancel")
     {
         var tcs = new TaskCompletionSource<bool>();
         var context = _contextProvider();
@@ -75,7 +75,7 @@ public partial class AndroidDialogService : IDialogService
             .SetMessage(message)
             .SetView(editText)
             .SetPositiveButton("OK", (s, e) => tcs.SetResult(editText.Text))
-            .SetNegativeButton("Cancelar", (s, e) => tcs.SetResult(null))
+            .SetNegativeButton("Cancel", (s, e) => tcs.SetResult(null))
             .SetOnCancelListener(new DialogCancelListener(() => tcs.SetResult(null)))
             .Show();
 

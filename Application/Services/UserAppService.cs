@@ -39,15 +39,15 @@ public sealed class UserAppService
             ? await _users.GetByIdAsync(dto.Id)
             : await _users.GetActiveAsync();
 
-        if (user is null) return (false, "Usuario no encontrado.");
+        if (user is null) return (false, "User not found.");
 
-        // Validaciones básicas
+        // Basic validations
         if (string.IsNullOrWhiteSpace(dto.Name))
-            return (false, "El nombre es obligatorio.");
+            return (false, "The name is required.");
         if (string.IsNullOrWhiteSpace(dto.Currency) || dto.Currency.Length != 3)
-            return (false, "La moneda debe tener 3 caracteres (ej: USD).");
+            return (false, "The currency must have 3 characters (e.g., USD).");
 
-        // Mapear cambios
+        // Map changes
         user.Name = dto.Name.Trim();
         user.Currency = dto.Currency.Trim().ToUpperInvariant();
         user.DateFormat = string.IsNullOrWhiteSpace(dto.DateFormat) ? "dd/MM/yyyy" : dto.DateFormat.Trim();

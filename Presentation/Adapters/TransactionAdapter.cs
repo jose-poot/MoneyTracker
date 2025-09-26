@@ -10,13 +10,13 @@ using System.Linq;
 namespace MoneyTracker.Presentation.Adapters
 {
     /// <summary>
-    /// Adapter para mostrar transacciones en RecyclerView
+    /// Adapter used to display transactions in a RecyclerView.
     /// </summary>
     public class TransactionAdapter : RecyclerView.Adapter
     {
         private List<TransactionDto> _transactions = new();
 
-        // Eventos para manejo de clicks
+        // Events for click handling
         public event Action<TransactionDto>? ItemClick;
         public event Action<TransactionDto>? EditClick;
         public event Action<TransactionDto>? DeleteClick;
@@ -24,7 +24,7 @@ namespace MoneyTracker.Presentation.Adapters
         public override int ItemCount => _transactions.Count;
 
         /// <summary>
-        /// Actualiza la lista de transacciones
+        /// Updates the list of transactions.
         /// </summary>
         public void UpdateTransactions(IEnumerable<TransactionDto> transactions)
         {
@@ -49,7 +49,7 @@ namespace MoneyTracker.Presentation.Adapters
         }
 
         /// <summary>
-        /// ViewHolder para cada item de transacción
+        /// ViewHolder for each transaction item
         /// </summary>
         private class TransactionViewHolder : RecyclerView.ViewHolder
         {
@@ -71,7 +71,7 @@ namespace MoneyTracker.Presentation.Adapters
                 _adapter = adapter;
                 
 
-                // Inicializar vistas
+                // Initialize views
                 _descriptionText = itemView.FindViewById<TextView>(Resource.Id.text_description)!;
                 _amountText = itemView.FindViewById<TextView>(Resource.Id.text_amount)!;
                 _categoryText = itemView.FindViewById<TextView>(Resource.Id.text_category)!;
@@ -81,7 +81,7 @@ namespace MoneyTracker.Presentation.Adapters
                 _editButton = itemView.FindViewById<ImageButton>(Resource.Id.button_edit)!;
                 _deleteButton = itemView.FindViewById<ImageButton>(Resource.Id.button_delete)!;
 
-                // Configurar event handlers
+                // Configure event handlers
                 itemView.Click += (s, e) =>
                 {
                     if (_currentTransaction != null)
@@ -102,19 +102,19 @@ namespace MoneyTracker.Presentation.Adapters
             }
 
             /// <summary>
-            /// Vincula los datos de una transacción con las vistas
+            /// Binds transaction data to the views
             /// </summary>
             public void Bind(TransactionDto transaction)
             {
                 _currentTransaction = transaction;
 
-                // Datos básicos
+                // Basic data
                 _descriptionText.Text = transaction.Description;
                 _amountText.Text = transaction.FormattedAmount;
                 _categoryText.Text = transaction.CategoryName;
                 _dateText.Text = transaction.FormattedDate;
 
-                // Color de categoría
+                // Category color
                 try
                 {
                     var color = Android.Graphics.Color.ParseColor(transaction.CategoryColor);
@@ -125,7 +125,7 @@ namespace MoneyTracker.Presentation.Adapters
                     _categoryColorIndicator.SetBackgroundColor(Android.Graphics.Color.Gray);
                 }
 
-                // Icono y color según tipo
+                // Icon and color based on type
                 if (transaction.Type == TransactionType.Income)
                 {
                     _typeIcon.SetImageResource(Android.Resource.Drawable.ArrowUpFloat);
@@ -137,7 +137,7 @@ namespace MoneyTracker.Presentation.Adapters
                     _amountText.SetTextColor(Android.Graphics.Color.Red);
                 }
 
-                // Mostrar notas si las hay
+                // Show notes when available
                 if (!string.IsNullOrWhiteSpace(transaction.Notes))
                 {
                     _descriptionText.Text = $"{transaction.Description}\n{transaction.Notes}";

@@ -3,20 +3,20 @@
 namespace MoneyTracker.Core.Interfaces.Repositories;
 
 /// <summary>
-/// Interfaz base para todos los repositorios
-/// Implementa el patrón Repository genérico
+/// Base interface for all repositories.
+/// Implements the generic Repository pattern.
 /// </summary>
-/// <typeparam name="T">Tipo de entidad</typeparam>
+/// <typeparam name="T">Entity type.</typeparam>
 public interface IRepository<T> where T : class
 {
-    // Operaciones básicas CRUD
+    // Basic CRUD operations
     Task<T?> GetByIdAsync(int id);
     Task<List<T>> GetAllAsync();
     Task<T> AddAsync(T entity);
     Task<T> UpdateAsync(T entity);
     Task<bool> DeleteAsync(int id);
 
-    // Consultas avanzadas
+    // Advanced queries
     Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate);
     Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
     Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);

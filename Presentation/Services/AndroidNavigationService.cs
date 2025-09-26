@@ -7,7 +7,6 @@ using Fragment = AndroidX.Fragment.App.Fragment;
 using MoneyTracker.Application.DTOs;
 using MoneyTracker.Presentation.Activities;
 using MoneyTracker.Presentation.Fragments;
-using MoneyTracker.Presentation.Navigation;
 using MoneyTracker.Presentation.Services.Interfaces;
 using MoneyTracker.Presentation.ViewModels;
 using System;
@@ -183,7 +182,7 @@ public class AndroidNavigationService : INavigationService
         }
 
 
-        bundle.PutString(NavigationParameterKeys.FragmentParameters, json);
+        bundle.PutString(NavigationKeys.FragmentParameters, json);
 
         return bundle;
     }

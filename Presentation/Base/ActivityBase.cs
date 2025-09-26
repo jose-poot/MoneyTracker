@@ -52,7 +52,7 @@ public abstract class ActivityBase<TViewModel> : AppCompatActivity
     }
 
     /// <summary>
-    /// Crea el conjunto de data binding siguiendo el patrón del arquitecto
+    /// Creates the binding set following the architect's pattern.
     /// </summary>
     protected DataBindingSet<TViewModel> CreateDataBindingSet()
     {
@@ -61,7 +61,7 @@ public abstract class ActivityBase<TViewModel> : AppCompatActivity
     }
 
     /// <summary>
-    /// Aplica los data bindings creados
+    /// Applies the data bindings that were created.
     /// </summary>
     protected void ApplyDataBindings()
     {

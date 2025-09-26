@@ -5,12 +5,12 @@ using MoneyTracker.Core.ValueObjects;
 namespace MoneyTracker.Infrastructure.Database;
 
 /// <summary>
-/// Helper para inicialización y migraciones de base de datos
+/// Helper for database initialization and migrations.
 /// </summary>
 public static class DatabaseInitializer
 {
     /// <summary>
-    /// Inicializa la base de datos con datos de ejemplo para desarrollo
+    /// Initializes the database with sample data for development.
     /// </summary>
     public static async Task SeedDevelopmentDataAsync(MoneyTrackerContext context, bool includeSampleTransactions = true)
     {
@@ -28,29 +28,29 @@ public static class DatabaseInitializer
     }
 
     /// <summary>
-    /// Crea transacciones de ejemplo para desarrollo
+    /// Creates sample transactions for development.
     /// </summary>
     private static async Task CreateSampleTransactionsAsync(MoneyTrackerContext context)
     {
-        // Obtener categorías existentes
+        // Retrieve existing categories
         var categories = await context.Categories.ToListAsync();
         if (!categories.Any()) return;
 
-        var alimentacionId = categories.FirstOrDefault(c => c.Name == "Alimentación")?.Id ?? 1;
-        var transporteId = categories.FirstOrDefault(c => c.Name == "Transporte")?.Id ?? 2;
-        var ingresosId = categories.FirstOrDefault(c => c.Name == "Ingresos")?.Id ?? 7;
+        var foodCategoryId = categories.FirstOrDefault(c => c.Name == "Food")?.Id ?? 1;
+        var transportCategoryId = categories.FirstOrDefault(c => c.Name == "Transport")?.Id ?? 2;
+        var incomeCategoryId = categories.FirstOrDefault(c => c.Name == "Income")?.Id ?? 7;
 
         var sampleTransactions = new List<Transaction>
             {
-                // Ingresos
-                Transaction.CreateIncome("Salario Enero", new Money(3000, "USD"), ingresosId, DateTime.Now.AddDays(-25)),
-                Transaction.CreateIncome("Freelance", new Money(500, "USD"), ingresosId, DateTime.Now.AddDays(-20)),
-                
-                // Gastos
-                Transaction.CreateExpense("Supermercado", new Money(150, "USD"), alimentacionId, DateTime.Now.AddDays(-5)),
-                Transaction.CreateExpense("Gasolina", new Money(80, "USD"), transporteId, DateTime.Now.AddDays(-3)),
-                Transaction.CreateExpense("Restaurante", new Money(45, "USD"), alimentacionId, DateTime.Now.AddDays(-2)),
-                Transaction.CreateExpense("Uber", new Money(25, "USD"), transporteId, DateTime.Now.AddDays(-1)),
+                // Income
+                Transaction.CreateIncome("January Salary", new Money(3000, "USD"), incomeCategoryId, DateTime.Now.AddDays(-25)),
+                Transaction.CreateIncome("Freelance", new Money(500, "USD"), incomeCategoryId, DateTime.Now.AddDays(-20)),
+
+                // Expenses
+                Transaction.CreateExpense("Groceries", new Money(150, "USD"), foodCategoryId, DateTime.Now.AddDays(-5)),
+                Transaction.CreateExpense("Gasoline", new Money(80, "USD"), transportCategoryId, DateTime.Now.AddDays(-3)),
+                Transaction.CreateExpense("Restaurant", new Money(45, "USD"), foodCategoryId, DateTime.Now.AddDays(-2)),
+                Transaction.CreateExpense("Ride Share", new Money(25, "USD"), transportCategoryId, DateTime.Now.AddDays(-1)),
             };
 
         context.Transactions.AddRange(sampleTransactions);
@@ -60,19 +60,19 @@ public static class DatabaseInitializer
     }
 
     /// <summary>
-    /// Verifica la salud de la base de datos
+    /// Checks the health of the database.
     /// </summary>
     public static async Task<bool> CheckDatabaseHealthAsync(MoneyTrackerContext context)
     {
         try
         {
-            // Verificar conexión
+            // Verify connectivity
             await context.Database.CanConnectAsync();
 
-            // Verificar que las tablas existen
+            // Verify that tables exist
             var categoriesExist = await context.Categories.AnyAsync();
 
-            // Verificar integridad básica
+            // Verify basic integrity
             var transactionCount = await context.Transactions.CountAsync();
             var categoryCount = await context.Categories.CountAsync();
 
@@ -88,7 +88,7 @@ public static class DatabaseInitializer
     }
 
     /// <summary>
-    /// Resetea la base de datos (solo para desarrollo)
+    /// Resets the database (development only).
     /// </summary>
     public static async Task ResetDatabaseAsync(MoneyTrackerContext context)
     {

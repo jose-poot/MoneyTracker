@@ -10,7 +10,7 @@ using MoneyTracker.Core.ValueObjects;
 
 namespace MoneyTracker.Application.Services;
 /// <summary>
-/// Servicio de aplicación para transacciones
+/// Application service for transactions.
 /// Coordina validaciones, conversiones y llamadas a repositorios
 /// </summary>
 public class TransactionAppService
@@ -39,7 +39,7 @@ public class TransactionAppService
     }
 
     /// <summary>
-    /// Obtiene todas las transacciones
+    /// Retrieves every transaction.
     /// </summary>
     public async Task<List<TransactionDto>> GetAllTransactionsAsync()
     {
@@ -48,7 +48,7 @@ public class TransactionAppService
     }
 
     /// <summary>
-    /// Obtiene transacciones por rango de fechas
+    /// Retrieves transactions by date range.
     /// </summary>
     public async Task<List<TransactionDto>> GetTransactionsByDateRangeAsync(DateTime startDate, DateTime endDate)
     {
@@ -57,7 +57,7 @@ public class TransactionAppService
     }
 
     /// <summary>
-    /// Obtiene una transacción específica
+    /// Retrieves a specific transaction.
     /// </summary>
     public async Task<TransactionDto?> GetTransactionByIdAsync(int id)
     {
@@ -66,11 +66,11 @@ public class TransactionAppService
     }
 
     /// <summary>
-    /// Crea una nueva transacción con validaciones completas
+    /// Creates a new transaction with full validation.
     /// </summary>
     public async Task<(bool Success, TransactionDto? Transaction, List<string> Errors)> CreateTransactionAsync(CreateTransactionDto createDto)
     {
-        // 1. Validar datos de entrada
+        // 1. Validate the input data
         var validationResult = await _createValidator.ValidateAsync(createDto);
         if (!validationResult.IsValid)
         {
@@ -80,47 +80,47 @@ public class TransactionAppService
 
         try
         {
-            // 2. Convertir DTO a entidad
+            // 2. Convert DTO to an entity
             var money = new Money(createDto.Amount, createDto.Currency);
 
-            // 3. Usar factory method del dominio para crear transacción correcta
+            // 3. Use domain factory methods to create the transaction properly
             var transaction = createDto.Type == TransactionType.Expense
                 ? Transaction.CreateExpense(createDto.Description, money, createDto.CategoryId, createDto.Date)
                 : Transaction.CreateIncome(createDto.Description, money, createDto.CategoryId, createDto.Date);
 
-            // 4. Establecer propiedades adicionales
+            // 4. Set additional properties
             transaction.Notes = createDto.Notes;
             transaction.Location = createDto.Location;
             transaction.IsRecurring = createDto.IsRecurring;
 
-            // 5. Validar reglas de dominio
+            // 5. Validate domain rules
             if (!transaction.IsValid(out var domainErrors))
             {
                 return (false, null, domainErrors);
             }
 
-            // 6. Guardar en repositorio
+            // 6. Persist to the repository
             var savedTransaction = await _transactionRepository.AddAsync(transaction);
 
-            // 7. Convertir a DTO para retorno
+            // 7. Map back to a DTO for the response
             var resultDto = _mapper.Map<TransactionDto>(savedTransaction);
 
             return (true, resultDto, new List<string>());
         }
         catch (Exception ex)
         {
-            // 8. Manejo de errores
-            var errorMessage = "Error al crear la transacción: " + ex.Message;
+            // 8. Error handling
+            var errorMessage = "Error creating the transaction: " + ex.Message;
             return (false, null, new List<string> { errorMessage });
         }
     }
 
     /// <summary>
-    /// Actualiza una transacción existente
+    /// Updates an existing transaction.
     /// </summary>
     public async Task<(bool Success, TransactionDto? Transaction, List<string> Errors)> UpdateTransactionAsync(TransactionDto transactionDto)
     {
-        // 1. Validar datos
+        // 1. Validate input data
         var validationResult = await _updateValidator.ValidateAsync(transactionDto);
         if (!validationResult.IsValid)
         {
@@ -130,14 +130,14 @@ public class TransactionAppService
 
         try
         {
-            // 2. Obtener transacción existente
+            // 2. Retrieve existing transaction
             var existingTransaction = await _transactionRepository.GetByIdAsync(transactionDto.Id);
             if (existingTransaction == null)
             {
-                return (false, null, new List<string> { "La transacción no existe" });
+                return (false, null, new List<string> { "The transaction does not exist" });
             }
 
-            // 3. Actualizar propiedades
+            // 3. Update mutable properties
             existingTransaction.Description = transactionDto.Description;
             existingTransaction.Amount = new Money(transactionDto.Amount, transactionDto.Currency);
             existingTransaction.CategoryId = transactionDto.CategoryId;
@@ -146,7 +146,7 @@ public class TransactionAppService
             existingTransaction.Location = transactionDto.Location;
             existingTransaction.IsRecurring = transactionDto.IsRecurring;
 
-            // 4. Cambiar tipo si es necesario
+            // 4. Change the type if necessary
             if (existingTransaction.Type != transactionDto.Type)
             {
                 existingTransaction.ChangeType(transactionDto.Type);
@@ -154,64 +154,64 @@ public class TransactionAppService
 
             existingTransaction.MarkAsUpdated();
 
-            // 5. Validar reglas de dominio
+            // 5. Validate domain rules
             if (!existingTransaction.IsValid(out var domainErrors))
             {
                 return (false, null, domainErrors);
             }
 
-            // 6. Actualizar en repositorio
+            // 6. Persist the changes in the repository
             var updatedTransaction = await _transactionRepository.UpdateAsync(existingTransaction);
 
-            // 7. Convertir a DTO
+            // 7. Map back to a DTO
             var resultDto = _mapper.Map<TransactionDto>(updatedTransaction);
 
             return (true, resultDto, new List<string>());
         }
         catch (Exception ex)
         {
-            var errorMessage = "Error al actualizar la transacción: " + ex.Message;
+            var errorMessage = "Error updating the transaction: " + ex.Message;
             return (false, null, new List<string> { errorMessage });
         }
     }
 
     /// <summary>
-    /// Elimina una transacción
+    /// Deletes a transaction.
     /// </summary>
     public async Task<(bool Success, List<string> Errors)> DeleteTransactionAsync(int id)
     {
         try
         {
-            // 1. Verificar que existe
+            // 1. Ensure it exists
             var transaction = await _transactionRepository.GetByIdAsync(id);
             if (transaction == null)
             {
-                return (false, new List<string> { "La transacción no existe" });
+                return (false, new List<string> { "The transaction does not exist" });
             }
 
-            // 2. Verificar reglas de negocio (puedes agregar más validaciones)
+            // 2. Verify business rules (additional validations can be added)
             var canDelete = await _transactionDomainService.CanDeleteTransactionAsync(id);
             if (!canDelete)
             {
-                return (false, new List<string> { "No se puede eliminar esta transacción" });
+                return (false, new List<string> { "This transaction cannot be deleted" });
             }
 
-            // 3. Eliminar
+            // 3. Delete
             var deleted = await _transactionRepository.DeleteAsync(id);
 
             return deleted
                 ? (true, new List<string>())
-                : (false, new List<string> { "Error al eliminar la transacción" });
+                : (false, new List<string> { "Error deleting the transaction" });
         }
         catch (Exception ex)
         {
-            var errorMessage = "Error al eliminar la transacción: " + ex.Message;
+            var errorMessage = "Error deleting the transaction: " + ex.Message;
             return (false, new List<string> { errorMessage });
         }
     }
 
     /// <summary>
-    /// Obtiene resumen financiero del mes actual
+    /// Retrieves the financial summary for the current month.
     /// </summary>
     public async Task<SummaryDto> GetMonthlySummaryAsync(int? year = null, int? month = null)
     {
@@ -221,26 +221,26 @@ public class TransactionAppService
 
         try
         {
-            // 1. Obtener transacciones del período
+            // 1. Retrieve transactions for the period
             var transactions = await _transactionRepository.GetByDateRangeAsync(startDate, endDate);
 
-            // 2. Calcular totales usando servicio de dominio
+            // 2. Calculate totals using the domain service
             var balance = await _transactionDomainService.GetCurrentBalanceAsync();
             var monthlyIncome = await _transactionDomainService.GetMonthlyIncomeAsync(targetDate.Year, targetDate.Month);
             var monthlyExpenses = await _transactionDomainService.GetMonthlyExpensesAsync(targetDate.Year, targetDate.Month);
 
-            // 3. Obtener categorías más usadas
+            // 3. Retrieve the most used categories
             var topCategories = await _transactionRepository.GetTopCategoriesAsync(5);
 
-            // 4. Obtener transacciones recientes
+            // 4. Retrieve recent transactions
             var recentTransactions = await _transactionRepository.GetRecentTransactionsAsync(5);
 
-            // 5. Crear DTO de resumen
+            // 5. Build the summary DTO
             var summary = new SummaryDto
             {
                 CurrentBalance = balance.Amount,
                 MonthlyIncome = monthlyIncome.Amount,
-                MonthlyExpenses = Math.Abs(monthlyExpenses.Amount), // Mostrar como positivo
+                MonthlyExpenses = Math.Abs(monthlyExpenses.Amount), // Display as a positive value
                 MonthlyBalance = monthlyIncome.Amount - Math.Abs(monthlyExpenses.Amount),
                 Currency = balance.Currency,
                 TotalTransactionsThisMonth = transactions.Count,
@@ -255,7 +255,7 @@ public class TransactionAppService
         }
         catch (Exception ex)
         {
-            // En caso de error, retornar un resumen vacío
+            // Return an empty summary in case of error
             return new SummaryDto
             {
                 CurrentBalance = 0,

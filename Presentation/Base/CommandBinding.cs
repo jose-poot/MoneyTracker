@@ -43,6 +43,6 @@ internal class CommandBinding<TView, TViewModel> : IBinding
 
     public void Dispose()
     {
-        // Los event handlers se limpian automáticamente cuando se destruye la vista
+        // Event handlers are automatically cleaned up when the view is destroyed
     }
 }

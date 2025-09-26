@@ -5,7 +5,7 @@ using MoneyTracker.Core.Interfaces.Repositories;
 namespace MoneyTracker.Application.Validators;
 
 /// <summary>
-/// Validador para CategoryDto
+/// Validator for <see cref="CategoryDto"/>.
 /// </summary>
 public class CategoryValidator : AbstractValidator<CategoryDto>
 {
@@ -22,27 +22,27 @@ public class CategoryValidator : AbstractValidator<CategoryDto>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("El nombre de la categoría es obligatorio")
+            .WithMessage("The category name is required")
             .Length(2, 50)
-            .WithMessage("El nombre debe tener entre 2 y 50 caracteres")
+            .WithMessage("The name must be between 2 and 50 characters")
             .MustAsync(BeUniqueName)
-            .WithMessage("Ya existe una categoría con este nombre");
+            .WithMessage("A category with this name already exists");
 
         RuleFor(x => x.Description)
             .MaximumLength(200)
-            .WithMessage("La descripción no puede tener más de 200 caracteres");
+            .WithMessage("The description cannot exceed 200 characters");
 
         RuleFor(x => x.Color)
             .NotEmpty()
-            .WithMessage("El color es obligatorio")
+            .WithMessage("The color is required")
             .Matches(@"^#([A-Fa-f0-9]{6})$")
-            .WithMessage("El color debe estar en formato hexadecimal (#RRGGBB)");
+            .WithMessage("The color must be in hexadecimal format (#RRGGBB)");
 
         RuleFor(x => x.Icon)
             .NotEmpty()
-            .WithMessage("El icono es obligatorio")
+            .WithMessage("The icon is required")
             .MaximumLength(50)
-            .WithMessage("El nombre del icono no puede tener más de 50 caracteres");
+            .WithMessage("The icon name cannot exceed 50 characters");
     }
 
     private async Task<bool> BeUniqueName(CategoryDto category, string name, CancellationToken cancellationToken)

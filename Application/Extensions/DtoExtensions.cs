@@ -4,12 +4,12 @@ using MoneyTracker.Core.Enums;
 namespace MoneyTracker.Application.Extensions;
 
 /// <summary>
-/// Métodos de extensión para DTOs
+/// Extension methods for DTOs.
 /// </summary>
 public static class DtoExtensions
 {
     /// <summary>
-    /// Filtra transacciones por tipo
+    /// Filters transactions by type.
     /// </summary>
     public static List<TransactionDto> OfType(this IEnumerable<TransactionDto> transactions, TransactionType type)
     {
@@ -17,7 +17,7 @@ public static class DtoExtensions
     }
 
     /// <summary>
-    /// Filtra transacciones por categoría
+    /// Filters transactions by category.
     /// </summary>
     public static List<TransactionDto> OfCategory(this IEnumerable<TransactionDto> transactions, int categoryId)
     {
@@ -25,7 +25,7 @@ public static class DtoExtensions
     }
 
     /// <summary>
-    /// Filtra transacciones por rango de fechas
+    /// Filters transactions by date range.
     /// </summary>
     public static List<TransactionDto> InDateRange(this IEnumerable<TransactionDto> transactions, DateTime startDate, DateTime endDate)
     {
@@ -33,7 +33,7 @@ public static class DtoExtensions
     }
 
     /// <summary>
-    /// Ordena transacciones por fecha descendente
+    /// Orders transactions by descending date.
     /// </summary>
     public static List<TransactionDto> OrderByDateDescending(this IEnumerable<TransactionDto> transactions)
     {
@@ -41,7 +41,7 @@ public static class DtoExtensions
     }
 
     /// <summary>
-    /// Calcula el total de un grupo de transacciones
+    /// Calculates the total amount for a group of transactions.
     /// </summary>
     public static decimal GetTotal(this IEnumerable<TransactionDto> transactions)
     {
@@ -49,7 +49,7 @@ public static class DtoExtensions
     }
 
     /// <summary>
-    /// Agrupa transacciones por mes
+    /// Groups transactions by month.
     /// </summary>
     public static Dictionary<string, List<TransactionDto>> GroupByMonth(this IEnumerable<TransactionDto> transactions)
     {
@@ -62,7 +62,7 @@ public static class DtoExtensions
     }
 
     /// <summary>
-    /// Convierte a formato para gráficos
+    /// Converts to a format used for charts.
     /// </summary>
     public static List<ChartDataDto> ToChartData(this IEnumerable<CategorySummaryDto> categories)
     {

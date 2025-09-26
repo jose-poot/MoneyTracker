@@ -93,7 +93,7 @@ internal class EditTextPropertyBinding<TViewModel, TProperty> : IBinding, IBindi
         throw new ArgumentException("Expression must be a property access");
     }
 
-    // Corrección del casting genérico
+    // Fix for the generic cast
     private Action<object, TProperty>? CreateSetter(Expression<Func<object, TProperty>> expression)
     {
         if (expression.Body is not MemberExpression member)
