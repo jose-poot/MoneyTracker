@@ -1,6 +1,7 @@
 using Android.App;
 using Android.OS;
 using System;
+using Application = Android.App.Application;
 
 namespace MoneyTracker.Presentation.Services;
 

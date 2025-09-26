@@ -5,6 +5,7 @@ using MoneyTracker.Infrastructure.Database;
 
 namespace MoneyTracker.Infrastructure.Repositories;
 
+/// <summary>
 /// Repositorio específico para categorías
 /// </summary>
 public class CategoryRepository : Repository<Category>, ICategoryRepository

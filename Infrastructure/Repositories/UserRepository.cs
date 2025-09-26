@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MoneyTracker.Core.Entities;
 using MoneyTracker.Core.Interfaces.Repositories;
 using MoneyTracker.Infrastructure.Database;
@@ -10,7 +10,7 @@ public sealed class UserRepository : Repository<User>, IUserRepository
     public UserRepository(MoneyTrackerContext context) : base(context) { }
 
     // Lecturas sin tracking (opcional, recomendado para solo-lectura)
-    public Task<User?> GetByIdAsync(int id) =>
+    public override Task<User?> GetByIdAsync(int id) =>
         _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
 
     public Task<User?> GetByEmailAsync(string email) =>
@@ -20,10 +20,7 @@ public sealed class UserRepository : Repository<User>, IUserRepository
         _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.IsActive);
 
     // Opción A1: delegar al base (que guarda internamente)
-    public async Task UpdateAsync(User user)
-    {
-        await base.UpdateAsync(user); // base llama SaveChangesAsync
-    }
+    public override Task<User> UpdateAsync(User user) => base.UpdateAsync(user); // base llama SaveChangesAsync
 
     // Si tu interfaz exige exponer SaveChangesAsync, impleméntalo correctamente:
     public Task<int> SaveChangesAsync() => _context.SaveChangesAsync();
