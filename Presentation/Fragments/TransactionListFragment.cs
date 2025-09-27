@@ -112,7 +112,7 @@ namespace MoneyTracker.Presentation.Fragments
             {
                 _layoutManager = new LinearLayoutManager(Context);
                 _recyclerView.SetLayoutManager(_layoutManager);
-                _recyclerView.SetHasFixedSize(true);
+                _recyclerView.HasFixedSize = true;
 
                 _adapter = new TransactionAdapter();
                 _recyclerView.SetAdapter(_adapter);
