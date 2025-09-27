@@ -10,6 +10,7 @@ using MoneyTracker.Presentation.ViewModels;
 using Google.Android.Material.TextField;
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using AndroidX.AppCompat.App;
