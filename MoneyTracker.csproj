@@ -8,7 +8,11 @@
 		<ApplicationId>com.companyname.MoneyTracker</ApplicationId>
 		<ApplicationVersion>1</ApplicationVersion>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<TrimMode>full</TrimMode>
+                <!-- Using full trimming on Android removes the generated Java wrapper
+                     for our activities, which prevents the runtime from locating
+                     MainActivity.  Revert to the safer partial trimming mode so
+                     the managed types that need Java bindings stay intact. -->
+                <TrimMode>partial</TrimMode>
 
              <!-- ✅ CRITICAL: Disable warnings as errors -->
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
