@@ -23,12 +23,12 @@ namespace MoneyTracker.Presentation.Activities
             var set = CreateDataBindingSet();
 
             set.Bind(txtUser).To<string>(vm => ((SettingsViewModel)vm).UserName).TwoWay();
-            set.Bind(btnSave).To(vm => ((SettingsViewModel)vm).SaveAsyncCommand);
+            set.Bind(btnSave).To(vm => ((SettingsViewModel)vm).SaveCommand);
 
             set.Apply();
             ApplyDataBindings();
 
-            _ = ViewModel.LoadAsyncCommand.ExecuteAsync(null);
+            _ = ViewModel.LoadCommand.ExecuteAsync(null);
         }
     }
 }
