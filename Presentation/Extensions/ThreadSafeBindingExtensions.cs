@@ -1,4 +1,4 @@
-﻿using Android.OS;
+using Android.OS;
 using Android.Widget;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
@@ -32,18 +32,42 @@ public static partial class ThreadSafeBindingExtensions
 
         void UpdateView()
         {
-            if (Looper.MyLooper() == Looper.MainLooper)
+            void ApplyText()
             {
                 var value = getter(viewModel);
-                view.Text = toStringConverter(value);
+                var newText = toStringConverter(value);
+
+                if (string.Equals(view.Text, newText, StringComparison.Ordinal))
+                    return;
+
+                if (view is EditText editText)
+                {
+                    var selectionStart = editText.SelectionStart;
+                    var selectionEnd = editText.SelectionEnd;
+
+                    editText.Text = newText;
+
+                    if (selectionStart >= 0 && selectionEnd >= 0)
+                    {
+                        var length = newText.Length;
+                        var clampedStart = Math.Clamp(selectionStart, 0, length);
+                        var clampedEnd = Math.Clamp(selectionEnd, 0, length);
+                        editText.SetSelection(clampedStart, clampedEnd);
+                    }
+                }
+                else
+                {
+                    view.Text = newText;
+                }
+            }
+
+            if (Looper.MyLooper() == Looper.MainLooper)
+            {
+                ApplyText();
             }
             else
             {
-                MainHandler.Post(() =>
-                {
-                    var value = getter(viewModel);
-                    view.Text = toStringConverter(value);
-                });
+                MainHandler.Post(ApplyText);
             }
         }
 
