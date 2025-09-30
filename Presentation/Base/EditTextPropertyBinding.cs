@@ -1,6 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MoneyTracker.Presentation.Base.Enums;
 using MoneyTracker.Presentation.Base.Interfaces;
+using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 
@@ -68,7 +69,23 @@ internal class EditTextPropertyBinding<TViewModel, TProperty> : IBinding, IBindi
     private void UpdateView()
     {
         var value = _getter(_viewModel);
-        _editText.Text = value?.ToString() ?? string.Empty;
+        var newText = value?.ToString() ?? string.Empty;
+
+        if (string.Equals(_editText.Text, newText, StringComparison.Ordinal))
+            return;
+
+        var selectionStart = _editText.SelectionStart;
+        var selectionEnd = _editText.SelectionEnd;
+
+        _editText.Text = newText;
+
+        if (selectionStart >= 0 && selectionEnd >= 0)
+        {
+            var length = newText.Length;
+            var clampedStart = Math.Clamp(selectionStart, 0, length);
+            var clampedEnd = Math.Clamp(selectionEnd, 0, length);
+            _editText.SetSelection(clampedStart, clampedEnd);
+        }
     }
 
     private T ConvertFromString<T>(string input)
