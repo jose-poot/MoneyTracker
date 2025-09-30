@@ -4,6 +4,7 @@ using MoneyTracker.Presentation.Base;
 using MoneyTracker.Presentation.Base.Interfaces;
 using System.Linq.Expressions;
 using Android.Views;
+using Android.Widget;
 
 internal class ViewBinding<TView, TViewModel> : IViewBinding<TView>, IBinding
         where TView : View
@@ -46,6 +47,8 @@ internal class ViewBinding<TView, TViewModel> : IViewBinding<TView>, IBinding
             CheckBox checkBox when typeof(TProperty) == typeof(bool) =>
                 new CheckBoxPropertyBinding<TViewModel>(checkBox, _viewModel,
                     vmProperty as Expression<Func<object, bool>>),
+            Spinner spinner => new SpinnerPropertyBinding<TViewModel, TProperty>(
+                spinner, _viewModel, vmProperty),
             _ => throw new NotSupportedException($"Binding not supported for {typeof(TView).Name}")
         };
     }
