@@ -1,35 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
         <!-- Primary theme -->
-	<style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
-		<item name="colorPrimary">@color/colorPrimary</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-		<item name="colorAccent">@color/colorAccent</item>
-		<item name="android:windowBackground">@color/background_light</item>
-	</style>
-	<style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-		<item name="colorPrimary">#2196F3</item>
-		<item name="colorPrimaryDark">#1976D2</item>
-		<item name="colorAccent">#FF4081</item>
-	</style>
+        <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+                <item name="colorPrimary">@color/colorPrimary</item>
+                <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+                <item name="colorAccent">@color/colorAccent</item>
+                <item name="android:windowBackground">@color/background_light</item>
+        </style>
+        <style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+                <item name="colorPrimary">#2196F3</item>
+                <item name="colorPrimaryDark">#1976D2</item>
+                <item name="colorAccent">#FF4081</item>
+        </style>
         <!-- Styles for forms -->
-	<style name="FormTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-		<item name="boxStrokeColor">@color/colorPrimary</item>
-		<item name="hintTextColor">@color/colorPrimary</item>
-	</style>
+        <style name="FormTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                <item name="boxStrokeColor">@color/colorPrimary</item>
+                <item name="hintTextColor">@color/colorPrimary</item>
+        </style>
 
         <!-- Styles for buttons -->
-	<style name="PrimaryButton" parent="Widget.MaterialComponents.Button">
-		<item name="backgroundTint">@color/colorPrimary</item>
-		<item name="android:textColor">@android:color/white</item>
-		<item name="cornerRadius">8dp</item>
-	</style>
+        <style name="PrimaryButton" parent="Widget.MaterialComponents.Button">
+                <item name="backgroundTint">@color/colorPrimary</item>
+                <item name="android:textColor">@android:color/white</item>
+                <item name="cornerRadius">8dp</item>
+        </style>
 
         <!-- Styles for cards -->
-	<style name="TransactionCard" parent="Widget.MaterialComponents.CardView">
-		<item name="cardCornerRadius">8dp</item>
-		<item name="cardElevation">2dp</item>
-		<item name="cardUseCompatPadding">true</item>
-	</style>
+        <style name="TransactionCard" parent="Widget.MaterialComponents.CardView">
+                <item name="cardCornerRadius">8dp</item>
+                <item name="cardElevation">2dp</item>
+                <item name="cardUseCompatPadding">true</item>
+        </style>
+
+        <!-- Settings specific styles -->
+        <style name="SettingsHeader" parent="TextAppearance.MaterialComponents.Headline6">
+                <item name="android:textColor">@color/on_surface</item>
+                <item name="android:textStyle">bold</item>
+                <item name="android:layout_marginBottom">16dp</item>
+        </style>
+
+        <style name="SettingsSection">
+                <item name="android:background">@color/surface</item>
+                <item name="android:padding">16dp</item>
+                <item name="android:layout_marginBottom">16dp</item>
+                <item name="android:elevation">2dp</item>
+        </style>
+
+        <style name="SettingsSectionTitle" parent="TextAppearance.MaterialComponents.Subtitle1">
+                <item name="android:textColor">@color/on_surface</item>
+                <item name="android:textStyle">bold</item>
+                <item name="android:layout_marginBottom">12dp</item>
+        </style>
+
+        <style name="SettingsLabel" parent="TextAppearance.MaterialComponents.Body2">
+                <item name="android:textColor">@color/on_surface</item>
+                <item name="android:layout_marginBottom">8dp</item>
+        </style>
+
+        <style name="SettingsSpinner">
+                <item name="android:layout_width">match_parent</item>
+                <item name="android:layout_height">wrap_content</item>
+                <item name="android:layout_marginBottom">16dp</item>
+        </style>
 
 </resources>

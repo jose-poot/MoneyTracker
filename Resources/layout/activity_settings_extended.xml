@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/background_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtSettingsTitle"
+            style="@style/SettingsHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_title" />
+
+        <LinearLayout
+            android:id="@+id/layoutInventorySettings"
+            style="@style/SettingsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtInventoryHeader"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_section_inventory" />
+
+            <TextView
+                android:id="@+id/lblWarehouse"
+                style="@style/SettingsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_warehouse_label" />
+
+            <Spinner
+                android:id="@+id/spinnerWarehouse"
+                style="@style/SettingsSpinner" />
+
+            <TextView
+                android:id="@+id/lblReceivingBin"
+                style="@style/SettingsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_receiving_bin_label" />
+
+            <Spinner
+                android:id="@+id/spinnerReceivingBin"
+                style="@style/SettingsSpinner" />
+
+            <TextView
+                android:id="@+id/lblZone"
+                style="@style/SettingsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_zone_label" />
+
+            <Spinner
+                android:id="@+id/spinnerZone"
+                style="@style/SettingsSpinner" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutFulfillmentSettings"
+            style="@style/SettingsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtFulfillmentHeader"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_section_fulfillment" />
+
+            <TextView
+                android:id="@+id/lblShippingBin"
+                style="@style/SettingsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_shipping_bin_label" />
+
+            <Spinner
+                android:id="@+id/spinnerShippingBin"
+                style="@style/SettingsSpinner" />
+
+            <TextView
+                android:id="@+id/lblPrinter"
+                style="@style/SettingsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_printer_label" />
+
+            <Spinner
+                android:id="@+id/spinnerPrinter"
+                style="@style/SettingsSpinner" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSaveSettings"
+            style="@style/PrimaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/button_save" />
+    </LinearLayout>
+</ScrollView>

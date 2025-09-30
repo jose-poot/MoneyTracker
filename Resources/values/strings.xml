@@ -39,4 +39,14 @@
         <string name="error_required_field">This field is required</string>
         <string name="error_invalid_amount">Invalid amount</string>
         <string name="error_connection">Connection error</string>
+
+        <!-- Settings -->
+        <string name="settings_title">Warehouse configuration</string>
+        <string name="settings_section_inventory">Inventory settings</string>
+        <string name="settings_section_fulfillment">Fulfillment settings</string>
+        <string name="settings_warehouse_label">Warehouse</string>
+        <string name="settings_receiving_bin_label">Receiving bin</string>
+        <string name="settings_shipping_bin_label">Shipping bin</string>
+        <string name="settings_zone_label">Zone</string>
+        <string name="settings_printer_label">Printer</string>
 </resources>
