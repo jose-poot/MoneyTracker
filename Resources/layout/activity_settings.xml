@@ -1,24 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="User name" />
-
-    <EditText
-        android:id="@+id/txtUserName"
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter your name" />
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/btnSave"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save" />
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Available warehouses" />
+
+        <TextView
+            android:id="@+id/txtWarehousesList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editSelectedWarehouse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Selected warehouse" />
+
+        <CheckBox
+            android:id="@+id/chkShowZones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show zones" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zones" />
+
+        <TextView
+            android:id="@+id/txtZonesList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editSelectedZone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Selected zone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Receiving bins" />
+
+        <TextView
+            android:id="@+id/txtReceivingBinsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editSelectedReceivingBin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Selected receiving bin" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shipping bins" />
+
+        <TextView
+            android:id="@+id/txtShippingBinsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editSelectedShippingBin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Selected shipping bin" />
+
+        <CheckBox
+            android:id="@+id/chkShowPrinters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show printers" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Printers" />
+
+        <TextView
+            android:id="@+id/txtPrintersList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editSelectedPrinter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Selected printer" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quick count types" />
+
+        <TextView
+            android:id="@+id/txtQuickCountTypesList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editSelectedQuickCountType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Selected quick count type" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnRefreshSettings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Refresh" />
+
+            <Button
+                android:id="@+id/btnSaveSettings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Save" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

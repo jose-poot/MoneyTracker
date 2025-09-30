@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MoneyTracker.Application.Services;
+using MoneyTracker.Application.Services.Interfaces;
 using MoneyTracker.Infrastructure.Database;
 using MoneyTracker.Infrastructure.DependencyInjection;
+using MoneyTracker.Infrastructure.Services;
 using MoneyTracker.Presentation.Services;
 using MoneyTracker.Presentation.Services.Interfaces;
 using System;
@@ -85,6 +87,9 @@ public class MoneyTrackerApplication : Android.App.Application
         services.AddSingleton<INavigationService>(sp => new AndroidNavigationService(sp.GetRequiredService<Func<Activity>>()));
         services.AddSingleton<ICacheService>(_ => new AndroidCacheService(ApplicationContext ?? throw new InvalidOperationException("ApplicationContext is not available")));
         services.AddSingleton<IMediaPickerService>(sp => new AndroidMediaPickerService(sp.GetRequiredService<Func<Activity>>()));
+        services.AddSingleton<ICommonQueryService, CommonQueryService>();
+        services.AddSingleton<ISettingsService, InMemorySettingsService>();
+        services.AddSingleton<IAcumaticaOptionsProvider, AcumaticaOptionsProvider>();
         // ViewModels
         services.AddTransient<MoneyTracker.Presentation.ViewModels.SettingsViewModel>();
         services.AddScoped<UserAppService>();
