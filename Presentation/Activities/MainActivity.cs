@@ -9,7 +9,12 @@ using MoneyTracker.Presentation.ViewModels;
 
 namespace MoneyTracker.Presentation.Activities
 {
-    [Activity(Label = "@string/app_name", MainLauncher = true)]
+    [Activity(
+        Label = "@string/app_name",
+        MainLauncher = true,
+        Exported = true,
+        Theme = "@style/MainTheme",
+        Name = "com.companyname.MoneyTracker.MainActivity")]
     public class MainActivity : ActivityBase<TransactionListViewModel>
     {
         protected override void OnCreate(Bundle? savedInstanceState)
